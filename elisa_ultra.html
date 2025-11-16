@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Elisa — ULTRA (Web App)</title>
+<meta name="description" content="Elisa ULTRA — interface web para rodar no navegador (iPhone Safari friendly).">
+<link rel="apple-touch-icon" href="data:,">
+<style>
+  :root{
+    --bg:#0b1220; --card:#0f1724; --accent:#4f46e5; --muted:#9aa4b2; --glass: rgba(255,255,255,0.04);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#071028 0%, #081226 100%);color:#e6eef8;}
+  .app{max-width:980px;margin:18px auto;padding:18px;}
+  header{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;box-shadow:0 6px 18px rgba(79,70,229,0.24)}
+  h1{font-size:18px;margin:0}
+  .sub{color:var(--muted);font-size:13px}
+  nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .btn{background:var(--glass);padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between}
+  .card h3{margin:0 0 6px 0;font-size:15px}
+  .card p{margin:0;color:var(--muted);font-size:13px}
+  footer{margin-top:18px;color:var(--muted);font-size:13px}
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);z-index:40}
+  .modal .panel{width:92%;max-width:520px;background:#071225;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
+  .row{display:flex;gap:8px;align-items:center}
+  input[type="text"],input[type="password"],textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  .small{font-size:12px;color:var(--muted)}
+  .search{display:flex;gap:8px;align-items:center;margin-top:12px}
+  .assistant-status{font-size:12px;color:var(--muted);margin-left:8px}
+  .note{font-size:12px;color:var(--muted);margin-top:8px}
+  .card .actions{display:flex;gap:8px;justify-content:flex-end}
+  .hidden{display:none}
+  audio{width:100%;margin-top:10px}
+  @media (max-width:420px){
+    .logo{width:48px;height:48px;font-size:18px}
+    .card{min-height:100px}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="logo">EL</div>
+    <div>
+      <h1>Elisa — ULTRA</h1>
+      <div class="sub">Versão web (PWA-friendly) — Abra no Safari e adicione à Tela de Início</div>
+    </div>
+    <div style="margin-left:auto;text-align:right">
+      <button class="btn" onclick="openLogin()">Entrar</button>
+      <button class="btn" onclick="promptInstall()">Instalar</button>
+    </div>
+  </header>
+
+  <nav>
+    <button class="btn" onclick="showSection('home')">Início</button>
+    <button class="btn" onclick="showSection('games')">Games</button>
+    <button class="btn" onclick="showSection('music')">Música</button>
+    <button class="btn" onclick="showSection('office')">Office</button>
+    <button class="btn" onclick="showSection('assistant')">Assistente</button>
+  </nav>
+
+  <main id="main">
+    <section id="home" class="section">
+      <div class="grid">
+        <div class="card">
+          <div>
+            <h3>Loja de Apps</h3>
+            <p>Instale web-apps e temas.</p>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <small class="small">Atualizado: 15/11/2025</small>
+            <button class="btn" onclick="alert('Loja ainda em construção')">Abrir</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div>
+            <h3>Games</h3>
+            <p>Emulação leve e links para jogos (local).</p>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <small class="small">Pré-instalado</small>
+            <button class="btn" onclick="showSection('games')">Jogos</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div>
+            <h3>Música</h3>
+            <p>Player integrado (stream local).</p>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <small class="small">Offline</small>
+            <button class="btn" onclick="showSection('music')">Abrir</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div>
+            <h3>Office</h3>
+            <p>Editor de notas rápido.</p>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <small class="small">Docs</small>
+            <button class="btn" onclick="showSection('office')">Abrir</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="games" class="section hidden" style="margin-top:12px">
+      <div class="card">
+        <h3>Games — Demo</h3>
+        <p>Aqui você pode adicionar ROMs localmente ao dispositivo (não inclua material protegido por direitos autorais).</p>
+        <div style="margin-top:12px" class="row">
+          <input type="file" id="rom" accept=".zip,.nes,.sfc,.gba" />
+          <button class="btn" onclick="alert('Modo demo: carregue ROMs locais para testar em emuladores suportados')">Carregar</button>
+        </div>
+        <div class="note">No iPhone, navegadores limitam acesso a emulação direta — esta área serve como gerenciador de arquivos para enviar ROMs a emuladores compatíveis.</div>
+      </div>
+    </section>
+
+    <section id="music" class="section hidden" style="margin-top:12px">
+      <div class="card">
+        <h3>Player — Música</h3>
+        <p>Toque músicas locais ou links de áudio.</p>
+        <div style="margin-top:12px" class="row">
+          <input type="file" id="audiofile" accept="audio/*" />
+          <button class="btn" onclick="loadLocalAudio()">Carregar</button>
+        </div>
+        <audio id="player" controls class="hidden"></audio>
+        <div class="note">No iPhone, músicas locais carregadas aqui serão reproduzidas no player do Safari.</div>
+      </div>
+    </section>
+
+    <section id="office" class="section hidden" style="margin-top:12px">
+      <div class="card">
+        <h3>Office — Notas</h3>
+        <p>Editor simples com salvar local (localStorage).</p>
+        <textarea id="note" rows="8" placeholder="Escreva suas notas..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+          <button class="btn" onclick="saveNote()">Salvar</button>
+          <button class="btn" onclick="loadNote()">Abrir</button>
+          <button class="btn" onclick="downloadNote()">Baixar .txt</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="assistant" class="section hidden" style="margin-top:12px">
+      <div class="card">
+        <h3>Assistente — Elisa</h3>
+        <p>Assistente por voz/texto (degrada para texto no iPhone se o reconhecimento de voz não estiver disponível).</p>
+        <div class="search">
+          <input type="text" id="query" placeholder="Diga algo ou escreva..." />
+          <button class="btn" onclick="askAssistant()">Perguntar</button>
+          <button class="btn" onclick="startVoice()" id="voiceBtn">🎤 Voz</button>
+        </div>
+        <div class="note">Observação: iOS Safari não fornece reconhecimento de voz via Web Speech API; o botão de voz usará a entrada por ditado do teclado quando disponível.</div>
+        <div id="assistantReply" class="note" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="small">Elisa ULTRA — Demo web • Feito por você + ChatGPT</div>
+      <div class="small">Adicionar à tela de início: Safari → Share → Add to Home Screen</div>
+    </div>
+  </footer>
+</div>
+
+<!-- Login Modal -->
+<div id="modalLogin" class="modal">
+  <div class="panel">
+    <h3>Entrar</h3>
+    <div class="row" style="margin-top:10px"><input id="user" type="text" placeholder="Usuário" /></div>
+    <div class="row" style="margin-top:8px"><input id="pass" type="password" placeholder="Senha" /></div>
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+      <button class="btn" onclick="doLogin()">Entrar</button>
+      <button class="btn" onclick="closeLogin()">Fechar</button>
+    </div>
+    <div class="note">Conta local: qualquer nome — isso salva no navegador (não é conta real).</div>
+  </div>
+</div>
+
+<script>
+// Simple navigation
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.add('hidden'));
+  const el = document.getElementById(id);
+  if(el) el.classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Login modal
+function openLogin(){ document.getElementById('modalLogin').style.display='flex'; }
+function closeLogin(){ document.getElementById('modalLogin').style.display='none'; }
+function doLogin(){
+  const u = document.getElementById('user').value || 'Usuário';
+  localStorage.setItem('elisa_user', u);
+  alert('Bem-vindo, ' + u + ' (conta local salva no navegador)');
+  closeLogin();
+}
+
+// Notes (Office)
+function saveNote(){ const v = document.getElementById('note').value; localStorage.setItem('elisa_note', v); alert('Nota salva localmente'); }
+function loadNote(){ const v = localStorage.getItem('elisa_note') || ''; document.getElementById('note').value = v; alert('Nota carregada'); }
+function downloadNote(){
+  const v = document.getElementById('note').value || '';
+  const blob = new Blob([v], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'elisa_note.txt'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },1500);
+}
+
+// Audio loader
+function loadLocalAudio(){
+  const f = document.getElementById('audiofile').files[0];
+  const player = document.getElementById('player');
+  if(!f){ alert('Escolha um arquivo de áudio'); return; }
+  const url = URL.createObjectURL(f);
+  player.src = url; player.classList.remove('hidden'); player.play().catch(()=>{});
+}
+
+// Assistant (simple)
+function askAssistant(){
+  const q = document.getElementById('query').value.trim();
+  if(!q){ alert('Escreva ou dite algo primeiro'); return; }
+  // Very simple rules-based replies for demo
+  let r = 'Desculpe, não entendi.';
+  const qq = q.toLowerCase();
+  if(qq.includes('horas')||qq.includes('hora')) r = 'Agora são ' + new Date().toLocaleTimeString();
+  else if(qq.includes('data')||qq.includes('dia')) r = 'Hoje é ' + new Date().toLocaleDateString();
+  else if(qq.includes('oi')||qq.includes('olá')) r = 'Olá! Em que posso ajudar?';
+  else if(qq.includes('abrir música')||qq.includes('tocar')){ showSection('music'); r='Abrindo Música'; }
+  else if(qq.includes('notas')||qq.includes('documento')){ showSection('office'); r='Abrindo Office (Notas)'; }
+  else r = 'Resposta automática: você disse — "'+ q + '".';
+  document.getElementById('assistantReply').innerText = r;
+  speakText(r);
+}
+
+// Voice (note: Safari iOS has limited SpeechRecognition support)
+function startVoice(){
+  // try Web Speech API recognition where available
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    // fallback: focus input to use iOS dictation
+    const q = document.getElementById('query');
+    q.focus();
+    alert('Reconhecimento por voz não disponível no navegador. Use a tecla de ditado do teclado (microfone do iOS).');
+    return;
+  }
+  const rec = new SpeechRecognition();
+  rec.lang = 'pt-BR';
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  rec.onresult = e => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('query').value = text;
+    askAssistant();
+  };
+  rec.onerror = e => { alert('Erro no reconhecimento: '+ e.error); }
+  rec.start();
+}
+
+// Speech synthesis
+function speakText(txt){
+  if(!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(txt);
+  u.lang = 'pt-BR';
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+// PWA install prompt: on iOS we can't trigger; show instructions
+function promptInstall(){
+  alert('No iPhone: Abra o Safari → Toque no botão Compartilhar → "Adicionar à Tela de Início" para instalar como app.');
+}
+
+// Persist last open section
+window.addEventListener('beforeunload', ()=>{
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(s=>{ if(!s.classList.contains('hidden')) localStorage.setItem('elisa_last', s.id); });
+});
+window.addEventListener('load', ()=>{
+  const last = localStorage.getItem('elisa_last') || 'home';
+  showSection(last);
+  // load saved note if exists
+  const note = localStorage.getItem('elisa_note'); if(note) document.getElementById('note').value = note;
+});
+
+// Simple offline caching (service worker registration)
+if('serviceWorker' in navigator){
+  try{ navigator.serviceWorker.register('sw-elisa.js').catch(()=>{}); }catch(e){}
+}
+
+// Quick keyboard shortcuts (desktop)
+document.addEventListener('keydown', (e)=>{
+  if(e.key === '1') showSection('home');
+  if(e.key === '2') showSection('games');
+  if(e.key === '3') showSection('music');
+  if(e.key === '4') showSection('office');
+  if(e.key === '5') showSection('assistant');
+});
+</script>
+
+</body>
+</html>
