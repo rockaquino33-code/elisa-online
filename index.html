@@ -1,89 +1,263 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Login - ELISA OS</title>
-    <style>
-        body {
-            background: #0d0d0d;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elisa OS - PS5 Ultimate Avançado</title>
+<style>
+  /* Fundo animado leve */
+  @keyframes gradientBG {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+  }
+  body {
+    margin:0;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(-45deg,#0f0c29,#302b63,#24243e,#1f1f1f);
+    background-size:400% 400%;
+    animation: gradientBG 20s ease infinite;
+    color:#fff;
+    overflow:hidden;
+  }
 
-        .login-box {
-            background: #1a1a1a;
-            padding: 30px;
-            border-radius: 10px;
-            width: 320px;
-            text-align: center;
-            box-shadow: 0px 0px 15px #000;
-        }
+  /* LOGIN */
+  .login-container {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+  }
+  .login-box {
+    background: rgba(0,0,0,0.85);
+    padding:50px;
+    border-radius:25px;
+    text-align:center;
+    box-shadow:0 0 25px #0078ff;
+    width:350px;
+  }
+  .login-box input {
+    width:100%;
+    padding:15px;
+    margin:12px 0;
+    border-radius:10px;
+    border:none;
+    font-size:16px;
+  }
+  .login-box button {
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:#0078ff;
+    color:#fff;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+  }
+  .login-box button:hover{background:#005fcc;}
+  #error{color:#ff4c4c;font-weight:bold;}
 
-        input {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
+  /* MENU LATERAL */
+  .app-container {
+    display:none;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .top-bar {
+    height:60px;
+    background: rgba(0,0,0,0.7);
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    padding:0 20px;
+    box-shadow:0 0 15px #0078ff;
+  }
+  .sidebar {
+    position:fixed;
+    left:0;
+    top:60px;
+    bottom:50px;
+    width:100px;
+    background: rgba(0,0,0,0.75);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding-top:20px;
+    transition: width 0.3s;
+  }
+  .sidebar:hover { width:140px; }
+  .app-btn {
+    width:80px;
+    margin:15px 0;
+    cursor:pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .app-btn img {
+    width:50px;
+    filter: drop-shadow(0 0 5px #0078ff);
+  }
+  .app-btn span {
+    font-size:14px;
+    margin-top:5px;
+    opacity:0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+  .sidebar:hover .app-btn span { opacity:1; }
+  .app-btn:hover {
+    transform: scale(1.2);
+    box-shadow:0 0 15px #00f;
+  }
 
-        button {
-            width: 95%;
-            padding: 10px;
-            background: #007bff;
-            color: white;
-            font-size: 17px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
+  /* BARRA INFERIOR */
+  .bottom-bar {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:50px;
+    background: rgba(0,0,0,0.7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:25px;
+    box-shadow:0 0 15px #0078ff;
+  }
+  .bottom-bar img {
+    width:35px;
+    transition: transform 0.3s, filter 0.3s;
+    cursor:pointer;
+  }
+  .bottom-bar img:hover {
+    transform: scale(1.5);
+    filter: drop-shadow(0 0 10px #00f);
+  }
 
-        button:hover {
-            background: #005ecc;
-        }
+  /* MAIN FRAME */
+  .main-frame {
+    margin-left:100px;
+    margin-top:60px;
+    margin-bottom:50px;
+    padding:20px;
+    height:calc(100vh - 110px);
+  }
+  iframe {
+    width:100%;
+    height:100%;
+    border:none;
+    border-radius:15px;
+    box-shadow:0 0 25px #0078ff;
+  }
 
-        .error {
-            color: #ff4d4d;
-            margin-top: 10px;
-            font-size: 14px;
-        }
-    </style>
+  /* MÚSICA DE FUNDO */
+  #bgMusic { display:none; }
+  .music-control {
+    position:fixed;
+    bottom:70px;
+    right:20px;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    background:#0078ff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:28px;
+    cursor:pointer;
+    box-shadow:0 0 20px #0078ff;
+  }
+</style>
 </head>
 <body>
 
-    <div class="login-box">
-        <h2>ELISA OS - Login</h2>
+<!-- LOGIN -->
+<div class="login-container" id="loginContainer">
+  <div class="login-box">
+    <h1>Elisa OS</h1>
+    <input type="text" id="username" placeholder="Usuário">
+    <input type="password" id="password" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+    <p id="error"></p>
+  </div>
+</div>
 
-        <input type="text" id="user" placeholder="Usuário">
-        <input type="password" id="pass" placeholder="Senha">
-
-        <button onclick="login()">Entrar</button>
-
-        <div id="msg" class="error"></div>
+<!-- MENU PRINCIPAL -->
+<div class="app-container" id="appContainer">
+  <div class="top-bar">
+    <h2>Elisa OS - PS5 Ultimate</h2>
+  </div>
+  <div class="sidebar">
+    <div class="app-btn" onclick="openApp('chat')">
+      <img src="https://cdn-icons-png.flaticon.com/512/1077/1077046.png" alt="Chat">
+      <span>Chat</span>
     </div>
+    <div class="app-btn" onclick="openApp('music')">
+      <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Música">
+      <span>Música</span>
+    </div>
+    <div class="app-btn" onclick="openApp('office')">
+      <img src="https://cdn-icons-png.flaticon.com/512/732/732221.png" alt="Office">
+      <span>Office</span>
+    </div>
+    <div class="app-btn" onclick="openApp('dalle')">
+      <img src="https://cdn-icons-png.flaticon.com/512/1055/1055687.png" alt="DALL·E">
+      <span>DALL·E</span>
+    </div>
+  </div>
+  <div class="main-frame" id="appFrame"></div>
+  <div class="bottom-bar">
+    <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Música" onclick="openApp('music')">
+    <img src="https://cdn-icons-png.flaticon.com/512/1077/1077046.png" alt="Chat" onclick="openApp('chat')">
+    <img src="https://cdn-icons-png.flaticon.com/512/732/732221.png" alt="Office" onclick="openApp('office')">
+    <img src="https://cdn-icons-png.flaticon.com/512/1055/1055687.png" alt="DALL·E" onclick="openApp('dalle')">
+  </div>
+</div>
 
-    <script>
-        function login() {
-            const user = document.getElementById("user").value;
-            const pass = document.getElementById("pass").value;
+<audio id="bgMusic" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+<div class="music-control" onclick="toggleMusic()">🎵</div>
 
-            const USER_OK = "Fabi3087";
-            const PASS_OK = "241188";
+<script>
+function login(){
+  const user=document.getElementById('username').value;
+  const pass=document.getElementById('password').value;
+  if(user==="Fabi3087" && pass==="241188"){
+    document.getElementById('loginContainer').style.opacity=0;
+    setTimeout(()=>{
+      document.getElementById('loginContainer').style.display='none';
+      document.getElementById('appContainer').style.display='flex';
+      openApp('chat');
+    },500);
+  }else{
+    document.getElementById('error').innerText="Usuário ou senha incorretos!";
+  }
+}
 
-            if (user === USER_OK && pass === PASS_OK) {
-                window.location.href = "elisa.html"; 
-            } else {
-                document.getElementById("msg").innerText = "Usuário ou senha incorretos!";
-            }
-        }
-    </script>
+function openApp(app){
+  const frame=document.getElementById('appFrame');
+  switch(app){
+    case 'chat': frame.innerHTML='<iframe src="https://chat.openai.com/" title="Chat Elisa"></iframe>'; break;
+    case 'music': frame.innerHTML='<iframe src="https://music.youtube.com/" title="Player de Música"></iframe>'; break;
+    case 'office': frame.innerHTML='<iframe src="https://office.com/" title="Office"></iframe>'; break;
+    case 'dalle': frame.innerHTML='<iframe src="https://openai.com/dall-e" title="DALL·E"></iframe>'; break;
+    default: frame.innerHTML=''; break;
+  }
+}
+
+function toggleMusic(){
+  const music=document.getElementById('bgMusic');
+  if(music.paused) music.play();
+  else music.pause();
+}
+</script>
 
 </body>
 </html>
