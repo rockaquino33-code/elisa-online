@@ -2,85 +2,206 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Elisa OS</title>
+<title>Elisa OS Ultra Premium</title>
 
-<!-- TRANSFORMA EM APP NO IPHONE -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Elisa">
-<link rel="apple-touch-icon" href="icone.png">
-
-<!-- ESTILO COMPLETO -->
+<!-- ESTILO INTERNO -->
 <style>
-    body {
-        margin: 0;
-        background: linear-gradient(135deg, #0b0f19, #1a1f3b);
-        color: white;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+    body{height:100vh; display:flex; flex-direction:column; overflow:hidden;}
+
+    /* FUNDO ANIMADO */
+    body::before{
+        content:'';
+        position:fixed;
+        top:0;left:0;width:100%;height:100%;
+        background: linear-gradient(135deg, #0b0f19, #1a1f3b, #0b0f19, #1a1f3b);
+        background-size: 400% 400%;
+        animation: gradientBG 20s ease infinite;
+        z-index:-1;
+    }
+    @keyframes gradientBG{
+        0%{background-position:0% 50%;}
+        50%{background-position:100% 50%;}
+        100%{background-position:0% 50%;}
     }
 
-    h1 {
-        font-size: 36px;
-        color: #2d6bff;
-        text-shadow: 0 0 10px #2d6bff, 0 0 20px #2d6bff;
-        margin-bottom: 10px;
+    /* TOPO / BARRA */
+    header{
+        background:#1a1f3b;
+        height:50px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:0 20px;
+        box-shadow:0 2px 5px rgba(0,0,0,0.5);
+    }
+    header h1{color:#2d6bff;font-size:20px;}
+    .top-buttons button{
+        margin-left:10px;
+        padding:5px 12px;
+        border:none;
+        border-radius:5px;
+        background:#2d6bff;
+        color:white;
+        cursor:pointer;
+        font-weight:bold;
+        transition:0.2s;
+    }
+    .top-buttons button:hover{background:#4a8cff;}
+
+    /* DESKTOP */
+    #desktop{
+        flex:1;
+        display:flex;
+        flex-wrap: wrap;
+        padding:20px;
+        gap:20px;
+        align-content:flex-start;
     }
 
-    p {
-        font-size: 18px;
-        margin-bottom: 30px;
+    /* ÍCONES */
+    .app{
+        width:100px;
+        height:100px;
+        background:#2d6bff;
+        border-radius:10px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
+        transition:0.3s;
+        text-align:center;
+        box-shadow:0 0 10px #2d6bff;
     }
-
-    button {
-        padding: 15px 30px;
-        margin: 10px;
-        border: none;
-        border-radius: 12px;
-        background: #2d6bff;
-        color: white;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: 0.2s;
-        box-shadow: 0 0 10px #2d6bff;
+    .app:hover{
+        transform: scale(1.1);
+        box-shadow:0 0 20px #2d6bff, 0 0 40px #2d6bff;
     }
+    .app img{width:50px;height:50px;margin-bottom:5px;}
+    .app span{font-size:14px;font-weight:bold;}
 
-    button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px #2d6bff, 0 0 40px #2d6bff;
+    /* JANELA POPUP */
+    .window{
+        position:fixed;
+        top:50%;
+        left:50%;
+        transform:translate(-50%,-50%);
+        width:80%;
+        height:80%;
+        background:#1a1f3b;
+        border-radius:10px;
+        box-shadow:0 0 20px rgba(0,0,0,0.7);
+        display:none;
+        flex-direction:column;
+        overflow:hidden;
+        z-index:1000;
     }
-
+    .window header{
+        background:#2d6bff;
+        padding:10px;
+        font-weight:bold;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        cursor:move;
+    }
+    .window .close-btn{
+        background:red;
+        width:20px;
+        height:20px;
+        border-radius:50%;
+        cursor:pointer;
+    }
+    .window .content{
+        flex:1;
+        overflow:auto;
+    }
+    .window iframe{
+        width:100%;
+        height:100%;
+        border:none;
+    }
 </style>
 </head>
 <body>
 
-<h1>ELISA OS</h1>
-<p>Sistema carregado como app no iPhone.</p>
+<header>
+    <h1>Elisa OS</h1>
+    <div class="top-buttons">
+        <button onclick="falaElisa()">Falar</button>
+        <button onclick="tocarMusica()">Música</button>
+    </div>
+</header>
 
-<button onclick="falaElisa()">Falar com a Elisa</button>
-<button onclick="tocarMusica()">Tocar Música</button>
+<div id="desktop">
+    <div class="app" onclick="abrirJanela('word')">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/word.png"/>
+        <span>Word</span>
+    </div>
+    <div class="app" onclick="abrirJanela('excel')">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/excel.png"/>
+        <span>Excel</span>
+    </div>
+    <div class="app" onclick="abrirJanela('powerpoint')">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/powerpoint.png"/>
+        <span>PowerPoint</span>
+    </div>
+    <div class="app" onclick="abrirJanela('calculadora')">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/calculator.png"/>
+        <span>Calculadora</span>
+    </div>
+    <div class="app" onclick="abrirJanela('notas')">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/note.png"/>
+        <span>Notas</span>
+    </div>
+    <div class="app" onclick="abrirJanela('jogos')">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/game-controller.png"/>
+        <span>Jogos</span>
+    </div>
+</div>
 
-<!-- SCRIPT COMPLETO -->
+<!-- JANELAS -->
+<div id="word" class="window">
+    <header>Word Online<div class="close-btn" onclick="fecharJanela('word')"></div></header>
+    <div class="content"><iframe src="https://www.office.com/launch/word"></iframe></div>
+</div>
+<div id="excel" class="window">
+    <header>Excel Online<div class="close-btn" onclick="fecharJanela('excel')"></div></header>
+    <div class="content"><iframe src="https://www.office.com/launch/excel"></iframe></div>
+</div>
+<div id="powerpoint" class="window">
+    <header>PowerPoint Online<div class="close-btn" onclick="fecharJanela('powerpoint')"></div></header>
+    <div class="content"><iframe src="https://www.office.com/launch/powerpoint"></iframe></div>
+</div>
+<div id="calculadora" class="window">
+    <header>Calculadora<div class="close-btn" onclick="fecharJanela('calculadora')"></div></header>
+    <div class="content"><p>Calculadora interna...</p></div>
+</div>
+<div id="notas" class="window">
+    <header>Notas<div class="close-btn" onclick="fecharJanela('notas')"></div></header>
+    <div class="content"><p>Notas internas...</p></div>
+</div>
+<div id="jogos" class="window">
+    <header>Jogos<div class="close-btn" onclick="fecharJanela('jogos')"></div></header>
+    <div class="content"><p>Jogos internos...</p></div>
+</div>
+
+<!-- SCRIPT -->
 <script>
-    // Botão "Falar com a Elisa"
-    function falaElisa() {
-        alert("Olá! Eu sou a Elisa rodando como APP no seu iPhone!");
-    }
-
-    // Botão "Tocar Música"
-    function tocarMusica() {
-        // Cria o elemento de áudio
-        var audio = new Audio('musica.mp3'); // Substitua pelo nome do arquivo de música
-        audio.play();
-        alert("Música iniciada!");
-    }
+function falaElisa(){
+    var msg=new SpeechSynthesisUtterance();
+    msg.text="Olá! Eu sou a Elisa, funcionando no seu computador!";
+    msg.lang="pt-BR"; msg.rate=1; msg.pitch=1;
+    window.speechSynthesis.speak(msg);
+}
+function tocarMusica(){
+    var audio=new Audio('musica.mp3');
+    audio.play();
+    alert("Música iniciada!");
+}
+function abrirJanela(id){document.getElementById(id).style.display='flex';}
+function fecharJanela(id){document.getElementById(id).style.display='none';}
 </script>
 
 </body>
