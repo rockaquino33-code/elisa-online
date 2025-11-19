@@ -2,206 +2,205 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Elisa OS Ultra Premium</title>
-
-<!-- ESTILO INTERNO -->
+<title>Elisa OS Pack Completa PS4</title>
 <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-    body{height:100vh; display:flex; flex-direction:column; overflow:hidden;}
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: url('https://i.imgur.com/2bXnJgX.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color:#fff;
+  overflow:hidden;
+}
 
-    /* FUNDO ANIMADO */
-    body::before{
-        content:'';
-        position:fixed;
-        top:0;left:0;width:100%;height:100%;
-        background: linear-gradient(135deg, #0b0f19, #1a1f3b, #0b0f19, #1a1f3b);
-        background-size: 400% 400%;
-        animation: gradientBG 20s ease infinite;
-        z-index:-1;
-    }
-    @keyframes gradientBG{
-        0%{background-position:0% 50%;}
-        50%{background-position:100% 50%;}
-        100%{background-position:0% 50%;}
-    }
+/* Menu PS4 com ícones reais */
+.header {
+  height:60px;
+  background: rgba(20,20,20,0.9);
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:20px;
+  padding-left:20px;
+  position:fixed;
+  width:100%;
+  z-index:10;
+  box-shadow:0 4px 6px rgba(0,0,0,0.5);
+}
 
-    /* TOPO / BARRA */
-    header{
-        background:#1a1f3b;
-        height:50px;
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        padding:0 20px;
-        box-shadow:0 2px 5px rgba(0,0,0,0.5);
-    }
-    header h1{color:#2d6bff;font-size:20px;}
-    .top-buttons button{
-        margin-left:10px;
-        padding:5px 12px;
-        border:none;
-        border-radius:5px;
-        background:#2d6bff;
-        color:white;
-        cursor:pointer;
-        font-weight:bold;
-        transition:0.2s;
-    }
-    .top-buttons button:hover{background:#4a8cff;}
+.header button {
+  background:#222;
+  border:none;
+  padding:10px 15px;
+  border-radius:10px;
+  cursor:pointer;
+  color:#fff;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  transition: transform 0.2s, background 0.2s;
+}
 
-    /* DESKTOP */
-    #desktop{
-        flex:1;
-        display:flex;
-        flex-wrap: wrap;
-        padding:20px;
-        gap:20px;
-        align-content:flex-start;
-    }
+.header button:hover, .header button.active {
+  transform: scale(1.15);
+  background:#444;
+}
 
-    /* ÍCONES */
-    .app{
-        width:100px;
-        height:100px;
-        background:#2d6bff;
-        border-radius:10px;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        cursor:pointer;
-        transition:0.3s;
-        text-align:center;
-        box-shadow:0 0 10px #2d6bff;
-    }
-    .app:hover{
-        transform: scale(1.1);
-        box-shadow:0 0 20px #2d6bff, 0 0 40px #2d6bff;
-    }
-    .app img{width:50px;height:50px;margin-bottom:5px;}
-    .app span{font-size:14px;font-weight:bold;}
+/* Janela de apps */
+.window {
+  display:none;
+  position:absolute;
+  top:80px;
+  left:50%;
+  transform:translateX(-50%);
+  width:780px;
+  height:520px;
+  background: rgba(15,15,15,0.95);
+  border-radius:15px;
+  padding:15px;
+  box-shadow:0 0 30px #000;
+  overflow:auto;
+  z-index:5;
+  transition: transform 0.3s, opacity 0.3s;
+}
 
-    /* JANELA POPUP */
-    .window{
-        position:fixed;
-        top:50%;
-        left:50%;
-        transform:translate(-50%,-50%);
-        width:80%;
-        height:80%;
-        background:#1a1f3b;
-        border-radius:10px;
-        box-shadow:0 0 20px rgba(0,0,0,0.7);
-        display:none;
-        flex-direction:column;
-        overflow:hidden;
-        z-index:1000;
-    }
-    .window header{
-        background:#2d6bff;
-        padding:10px;
-        font-weight:bold;
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        cursor:move;
-    }
-    .window .close-btn{
-        background:red;
-        width:20px;
-        height:20px;
-        border-radius:50%;
-        cursor:pointer;
-    }
-    .window .content{
-        flex:1;
-        overflow:auto;
-    }
-    .window iframe{
-        width:100%;
-        height:100%;
-        border:none;
-    }
+.window.active { display:block; opacity:1; transform:scale(1); }
+
+/* Log de tarefas */
+.task-log {
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  max-height:150px;
+  overflow:auto;
+  background: rgba(20,20,20,0.85);
+  font-size:12px;
+  color:#aaa;
+  padding:5px;
+  box-sizing:border-box;
+  z-index:10;
+}
 </style>
 </head>
 <body>
 
-<header>
-    <h1>Elisa OS</h1>
-    <div class="top-buttons">
-        <button onclick="falaElisa()">Falar</button>
-        <button onclick="tocarMusica()">Música</button>
-    </div>
-</header>
-
-<div id="desktop">
-    <div class="app" onclick="abrirJanela('word')">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/word.png"/>
-        <span>Word</span>
-    </div>
-    <div class="app" onclick="abrirJanela('excel')">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/excel.png"/>
-        <span>Excel</span>
-    </div>
-    <div class="app" onclick="abrirJanela('powerpoint')">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/powerpoint.png"/>
-        <span>PowerPoint</span>
-    </div>
-    <div class="app" onclick="abrirJanela('calculadora')">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/calculator.png"/>
-        <span>Calculadora</span>
-    </div>
-    <div class="app" onclick="abrirJanela('notas')">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/note.png"/>
-        <span>Notas</span>
-    </div>
-    <div class="app" onclick="abrirJanela('jogos')">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/game-controller.png"/>
-        <span>Jogos</span>
-    </div>
+<!-- Menu PS4 -->
+<div class="header">
+  <button id="btn-music" onclick="openModule('music', this)">❎ Música</button>
+  <button id="btn-office" onclick="openModule('office', this)">🟢 Office</button>
+  <button id="btn-games" onclick="openModule('games', this)">🟣 Jogos</button>
+  <button id="btn-retro" onclick="openModule('retro', this)">🟡 RetroArch</button>
+  <button id="btn-settings" onclick="openModule('settings', this)">🔵 Configurações</button>
 </div>
 
-<!-- JANELAS -->
-<div id="word" class="window">
-    <header>Word Online<div class="close-btn" onclick="fecharJanela('word')"></div></header>
-    <div class="content"><iframe src="https://www.office.com/launch/word"></iframe></div>
-</div>
-<div id="excel" class="window">
-    <header>Excel Online<div class="close-btn" onclick="fecharJanela('excel')"></div></header>
-    <div class="content"><iframe src="https://www.office.com/launch/excel"></iframe></div>
-</div>
-<div id="powerpoint" class="window">
-    <header>PowerPoint Online<div class="close-btn" onclick="fecharJanela('powerpoint')"></div></header>
-    <div class="content"><iframe src="https://www.office.com/launch/powerpoint"></iframe></div>
-</div>
-<div id="calculadora" class="window">
-    <header>Calculadora<div class="close-btn" onclick="fecharJanela('calculadora')"></div></header>
-    <div class="content"><p>Calculadora interna...</p></div>
-</div>
-<div id="notas" class="window">
-    <header>Notas<div class="close-btn" onclick="fecharJanela('notas')"></div></header>
-    <div class="content"><p>Notas internas...</p></div>
-</div>
-<div id="jogos" class="window">
-    <header>Jogos<div class="close-btn" onclick="fecharJanela('jogos')"></div></header>
-    <div class="content"><p>Jogos internos...</p></div>
+<!-- Janelas dos Apps -->
+<div id="music" class="window">
+<h2>🎵 Player de Música</h2>
+<audio id="audioPlayer" controls autoplay loop style="width:100%;">
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
 </div>
 
-<!-- SCRIPT -->
+<div id="office" class="window">
+<h2>📄 Office Online</h2>
+<iframe src="https://office.live.com/start/Word.aspx" width="100%" height="450px" style="border:none;"></iframe>
+</div>
+
+<div id="games" class="window">
+<h2>🎮 Jogos Clássicos</h2>
+<ul>
+  <li><a href="https://www.retrogames.cc/embed/26098-nintendo-super-mario-bros.html" target="_blank">Super Mario Bros</a></li>
+  <li><a href="https://www.retrogames.cc/embed/27052-nintendo-duck-hunt.html" target="_blank">Duck Hunt</a></li>
+  <li><a href="https://www.retrogames.cc/embed/27018-snes-super-mario-world.html" target="_blank">Super Mario World</a></li>
+  <li><a href="https://www.retrogames.cc/embed/26799-snes-zelda-link-to-the-past.html" target="_blank">Zelda: Link to the Past</a></li>
+  <li><a href="https://www.retrogames.cc/embed/26398-nes-mega-man-2.html" target="_blank">Mega Man 2</a></li>
+  <!-- Adicione mais jogos aqui -->
+</ul>
+</div>
+
+<div id="retro" class="window">
+<h2>🕹️ RetroArch Online</h2>
+<iframe src="https://buildbot.libretro.com/web/retroarch.html" width="100%" height="500px" style="border:none;"></iframe>
+</div>
+
+<div id="settings" class="window">
+<h2>⚙️ Configurações</h2>
+<p>Controle volume, tema, apps e gerenciamento do sistema.</p>
+</div>
+
+<div class="task-log" id="log"></div>
+
 <script>
-function falaElisa(){
-    var msg=new SpeechSynthesisUtterance();
-    msg.text="Olá! Eu sou a Elisa, funcionando no seu computador!";
-    msg.lang="pt-BR"; msg.rate=1; msg.pitch=1;
-    window.speechSynthesis.speak(msg);
+// ==== Core Inteligente ====
+let taskQueue=[];
+let openWindows={};
+let activeButton=null;
+
+function log(msg){
+  const logEl=document.getElementById('log');
+  logEl.innerHTML+=msg+'<br>';
+  logEl.scrollTop=logEl.scrollHeight;
 }
-function tocarMusica(){
-    var audio=new Audio('musica.mp3');
-    audio.play();
-    alert("Música iniciada!");
+
+// ==== Fila de tarefas ====
+function addTask(task, priority=1){
+  taskQueue.push({task,priority});
+  taskQueue.sort((a,b)=>b.priority-a.priority);
 }
-function abrirJanela(id){document.getElementById(id).style.display='flex';}
-function fecharJanela(id){document.getElementById(id).style.display='none';}
+
+function runTasks(){
+  if(taskQueue.length>0){
+    const nextTask=taskQueue.shift();
+    try{ nextTask.task(); } catch(e){ log("Erro na tarefa: "+e);}
+  }
+}
+
+// ==== Monitor Recursos ====
+function checkMemory(){
+  if(performance.memory){
+    const used=performance.memory.usedJSHeapSize;
+    const limit=performance.memory.jsHeapSizeLimit;
+    if((used/limit)>0.7) log("⚠️ Memória >70%! Feche módulos ou aguarde.");
+  }
+}
+
+// ==== Abrir/Fechar Módulos ====
+function openModule(name, btn){
+  // Destaque botão ativo
+  if(activeButton) activeButton.classList.remove('active');
+  btn.classList.add('active');
+  activeButton=btn;
+
+  const keys=Object.keys(openWindows);
+  if(keys.length>2){ closeModule(keys[0]); }
+
+  if(!openWindows[name]){
+    const el=document.getElementById(name);
+    if(el){ el.classList.add('active'); openWindows[name]=Date.now(); log(`🟢 Módulo ${name} aberto.`);}
+  } else { log(`ℹ️ Módulo ${name} já aberto.`);}
+}
+
+function closeModule(name){
+  const el=document.getElementById(name);
+  if(el){ el.classList.remove('active'); delete openWindows[name]; log(`🔴 Módulo ${name} fechado automaticamente.`);}
+}
+
+// Fecha módulos inativos >1min
+setInterval(()=>{
+  const now=Date.now();
+  for(const name in openWindows){
+    if(now-openWindows[name]>60000) closeModule(name);
+  }
+},5000);
+
+// Loop principal
+setInterval(()=>{ checkMemory(); runTasks(); },1000);
+
+// Tarefas automáticas
+addTask(()=>log("🟡 Elisa OS Pack Completa PS4 inicializada"),3);
+addTask(()=>log("🟡 Todos os módulos prontos para uso"),2);
 </script>
 
 </body>
