@@ -1,369 +1,204 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elisa OS 3.3 Futurista</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; user-select: none; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a0f; }
-
-    /* Desktop */
-    #desktop {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background: url('https://i.imgur.com/7GxO6Qj.jpg') no-repeat center center;
-      background-size: cover;
-    }
-
-    /* Ícones */
-    .icon {
-      position: absolute;
-      width: 80px;
-      text-align: center;
-      cursor: grab;
-      color: #fff;
-      font-size: 12px;
-      transition: transform 0.2s;
-      z-index: 5;
-    }
-    .icon img {
-      width: 64px;
-      height: 64px;
-      filter: drop-shadow(0 0 5px rgba(0, 150, 255, 0.6));
-    }
-    .icon.dragging {
-      transform: scale(1.1);
-      opacity: 0.7;
-    }
-
-    /* Janela */
-    .window {
-      position: absolute;
-      width: 600px;
-      height: 400px;
-      background: rgba(15, 15, 20, 0.95);
-      border: 2px solid rgba(0, 120, 255, 0.5);
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 120, 255, 0.4);
-      display: none;
-      z-index: 10;
-      overflow: hidden;
-    }
-    .window-header {
-      background: rgba(0, 120, 255, 0.3);
-      padding: 5px;
-      cursor: grab;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .window-header .title { color: white; font-weight: bold; }
-    .window-header .close {
-      width: 20px; height: 20px;
-      text-align: center; line-height: 20px;
-      cursor: pointer; color: white;
-      background: rgba(255, 0, 0, 0.7); border-radius: 50%;
-    }
-    .window-content {
-      width: 100%;
-      height: calc(100% - 30px);
-      background: #111;
-      color: #fff;
-      overflow: auto;
-      padding: 10px;
-    }
-
-    /* Barra de tarefas */
-    #taskbar {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 40px;
-      background: rgba(10,10,15,0.9);
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      justify-content: space-between;
-      border-top: 1px solid rgba(0,120,255,0.4);
-      color: #fff;
-      z-index: 1000;
-    }
-    #taskbar .left, #taskbar .right { display: flex; align-items: center; }
-    .task-icon {
-      width: 32px; height: 32px;
-      margin-right: 5px;
-      cursor: pointer;
-    }
-    .task-icon img {
-      width: 100%; height: 100%;
-    }
-    .system-icon {
-      width: 32px; height: 32px;
-      margin-left: 5px;
-      cursor: pointer;
-    }
-
-    /* Menu Start da Elisa */
-    #start-menu {
-      position: absolute;
-      bottom: 40px;
-      left: 10px;
-      width: 200px;
-      background: rgba(10,10,15,0.95);
-      border: 1px solid rgba(0,120,255,0.5);
-      border-radius: 10px;
-      display: none;
-      flex-direction: column;
-      color: #fff;
-      padding: 10px;
-      z-index: 1000;
-    }
-    #start-menu .start-item {
-      padding: 5px;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background 0.2s;
-    }
-    #start-menu .start-item:hover {
-      background: rgba(0,120,255,0.3);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elisa OS Web – Desktop PS5</title>
+<style>
+html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family:Arial,sans-serif; background:#000; }
+#wallpaper { position:fixed; top:0; left:0; width:100%; height:100%; background:url('https://wallpaperbat.com/wallpapers/3840x2160/ps5_4k-picture-71406') center/cover no-repeat; filter:brightness(0.85); z-index:-1; }
+.desktop-icon, .start-icon, .taskbar-icon { position:absolute; text-align:center; color:white; cursor:pointer; user-select:none; }
+.desktop-icon img, .start-icon img, .taskbar-icon img { width:48px; }
+.desktop-icon span, .start-icon span, .taskbar-icon span { display:block; margin-top:4px; font-size:12px; }
+#taskbar { position:fixed; bottom:0; left:0; height:50px; width:100%; background: rgba(0,0,40,0.8); display:flex; align-items:center; padding:0 10px; color:white; z-index:10; }
+.task-icon { margin-right:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+#clock { margin-left:auto; }
+#volume-container { display:flex; align-items:center; margin-left:10px; }
+#volume-slider { width:100px; }
+#startMenu { display:none; position:fixed; bottom:60px; left:20px; width:320px; background: rgba(20,20,40,0.9); padding:10px; border-radius:12px; color:white; backdrop-filter:blur(10px); box-shadow:0 8px 20px rgba(0,0,0,0.6); z-index:15; display:flex; flex-wrap:wrap; }
+.start-icon { width:60px; height:60px; margin:5px; text-align:center; cursor:pointer; user-select:none; }
+.start-icon img { width:40px; height:40px; display:block; margin:0 auto; }
+.start-icon span { font-size:12px; color:white; }
+#windows-area { position:absolute; top:0; left:0; width:100%; height:100%; }
+.window { position:absolute; background: rgba(20,20,40,0.95); border-radius:10px; border:1px solid rgba(255,255,255,0.2); box-shadow:0 8px 30px rgba(0,0,0,0.5); width:700px; height:450px; display:flex; flex-direction:column; }
+.window-header { height:36px; background: linear-gradient(to right,#222244,#1a1a3a); padding:0 10px; display:flex; align-items:center; cursor:grab; border-top-left-radius:10px; border-top-right-radius:10px; }
+.window-btns { margin-left:auto; display:flex; gap:6px; }
+.window-btn { width:16px; height:16px; border-radius:50%; cursor:pointer; }
+.win-min { background:#f1c232; }
+.win-max { background:#6aa84f; }
+.win-close { background:#e06666; }
+.window-content { flex:1; background: rgba(0,0,0,0.7); border-bottom-left-radius:10px; border-bottom-right-radius:10px; overflow:auto; padding:5px; color:white; }
+input, button { font-size:14px; }
+button { margin-left:5px; cursor:pointer; }
+#start-button { width:40px; height:40px; background:rgba(0,255,255,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-right:10px; transition:0.2s; }
+#start-button:hover { background:rgba(0,255,255,0.4); }
+#start-button img { width:24px; height:24px; }
+.dragging { opacity:0.6; box-shadow:0 8px 30px rgba(0,255,255,0.8);}
+</style>
 </head>
 <body>
-  <div id="desktop">
-    <!-- Ícones da área de trabalho -->
-    <div class="icon" id="icon-elisa" style="top:20px; left:20px;">
-      <img src="https://i.imgur.com/zJ4qj5U.png" alt="Elisa"><br>Elisa
-    </div>
-    <div class="icon" id="icon-browser" style="top:20px; left:120px;">
-      <img src="https://i.imgur.com/6dQj3Lp.png" alt="Browser"><br>Navegador
-    </div>
-    <div class="icon" id="icon-word" style="top:20px; left:220px;">
-      <img src="https://i.imgur.com/9R5dF3l.png" alt="Word"><br>Word
-    </div>
-    <div class="icon" id="icon-notes" style="top:120px; left:20px;">
-      <img src="https://i.imgur.com/5fXOlrL.png" alt="Notas"><br>Notas
-    </div>
-    <div class="icon" id="icon-pdf" style="top:120px; left:120px;">
-      <img src="https://i.imgur.com/G3eWf52.png" alt="PDF"><br>PDF
-    </div>
-    <div class="icon" id="icon-emulator" style="top:120px; left:220px;">
-      <img src="https://i.imgur.com/fmWUvH3.png" alt="Emulador"><br>Emulador
-    </div>
-    <div class="icon" id="icon-trash" style="top:20px; left:320px;">
-      <img src="https://i.imgur.com/Z8Z0Gsu.png" alt="Lixeira"><br>Lixeira
-    </div>
 
-    <!-- Janelas -->
-    <div class="window" id="win-elisa">
-      <div class="window-header">
-        <span class="title">Elisa AI</span>
-        <span class="close" onclick="closeWindow('win-elisa')">×</span>
-      </div>
-      <div class="window-content" id="elisa-content" contenteditable="true">
-        <div id="elisa-messages"></div>
-        <input type="text" id="elisa-input" placeholder="Pergunte algo à Elisa..." style="width:100%; padding:5px; margin-top:5px;" />
-        <button onclick="sendToElisa()">Enviar</button>
-      </div>
-    </div>
+<audio id="ps5-start" src="https://www.soundboard.com/sb/sounds/ps5-startup-sound.mp3"></audio>
+<audio id="ps5-click" src="https://www.soundboard.com/sb/sounds/ps5-button-click.mp3"></audio>
 
-    <div class="window" id="win-browser">
-      <div class="window-header">
-        <span class="title">Navegador</span>
-        <span class="close" onclick="closeWindow('win-browser')">×</span>
-      </div>
-      <div class="window-content">
-        <iframe id="browser-iframe" src="https://www.google.com" style="width:100%; height:100%; border:none;"></iframe>
-      </div>
-    </div>
+<!-- Desktop icons -->
+<div class="desktop-icon" style="top:50px; left:40px;" data-app="browser"><img src="https://img.icons8.com/ios-filled/50/internet.png"><span>Navegador</span></div>
+<div class="desktop-icon" style="top:150px; left:40px;" data-app="terminal"><img src="https://img.icons8.com/ios-filled/50/console.png"><span>Terminal</span></div>
+<div class="desktop-icon" style="top:250px; left:40px;" data-app="elisa"><img src="https://img.icons8.com/ios-filled/50/assistant.png"><span>Elisa</span></div>
+<div class="desktop-icon" style="top:350px; left:40px;" data-app="recycle"><img src="https://img.icons8.com/ios-filled/50/recycle-bin.png"><span>Lixeira</span></div>
+<div class="desktop-icon" style="top:450px; left:40px;" data-app="pc"><img src="https://img.icons8.com/ios-filled/50/computer.png"><span>Meu PC</span></div>
+<div class="desktop-icon" style="top:550px; left:40px;" data-app="word"><img src="https://img.icons8.com/ios-filled/50/ms-word.png"><span>Word</span></div>
+<div class="desktop-icon" style="top:650px; left:40px;" data-app="notepad"><img src="https://img.icons8.com/ios-filled/50/notepad.png"><span>Notepad</span></div>
+<div class="desktop-icon" style="top:750px; left:40px;" data-app="emulator"><img src="https://img.icons8.com/ios-filled/50/playstation.png"><span>Emulador</span></div>
 
-    <div class="window" id="win-word">
-      <div class="window-header">
-        <span class="title">Word</span>
-        <span class="close" onclick="closeWindow('win-word')">×</span>
-      </div>
-      <div class="window-content" contenteditable="true"></div>
-    </div>
+<!-- Taskbar -->
+<div id="taskbar">
+  <div id="start-button" onclick="toggleStart()"><img src="https://img.icons8.com/ios-filled/50/ps5.png"></div>
+  <div class="task-icon taskbar-icon" data-app="browser">Navegador</div>
+  <div id="volume-container">🔊 <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1"></div>
+  <div id="clock"></div>
+</div>
 
-    <div class="window" id="win-notes">
-      <div class="window-header">
-        <span class="title">Bloco de Notas</span>
-        <span class="close" onclick="closeWindow('win-notes')">×</span>
-      </div>
-      <div class="window-content" contenteditable="true"></div>
-    </div>
+<!-- Start Menu -->
+<div id="startMenu">
+  <div class="start-icon" data-app="browser"><img src="https://img.icons8.com/ios-filled/50/internet.png"><span>Navegador</span></div>
+  <div class="start-icon" data-app="terminal"><img src="https://img.icons8.com/ios-filled/50/console.png"><span>Terminal</span></div>
+  <div class="start-icon" data-app="elisa"><img src="https://img.icons8.com/ios-filled/50/assistant.png"><span>Elisa</span></div>
+  <div class="start-icon" data-app="word"><img src="https://img.icons8.com/ios-filled/50/ms-word.png"><span>Word</span></div>
+  <div class="start-icon" data-app="notepad"><img src="https://img.icons8.com/ios-filled/50/notepad.png"><span>Notepad</span></div>
+  <div class="start-icon" data-app="emulator"><img src="https://img.icons8.com/ios-filled/50/playstation.png"><span>Emulador</span></div>
+  <div class="start-icon" data-app="recycle"><img src="https://img.icons8.com/ios-filled/50/recycle-bin.png"><span>Lixeira</span></div>
+  <div class="start-icon" data-app="pc"><img src="https://img.icons8.com/ios-filled/50/computer.png"><span>Meu PC</span></div>
+</div>
 
-    <div class="window" id="win-pdf">
-      <div class="window-header">
-        <span class="title">PDF</span>
-        <span class="close" onclick="closeWindow('win-pdf')">×</span>
-      </div>
-      <div class="window-content">Visualizador de PDF (simulado)</div>
-    </div>
-
-    <div class="window" id="win-emulator">
-      <div class="window-header">
-        <span class="title">Emulador</span>
-        <span class="close" onclick="closeWindow('win-emulator')">×</span>
-      </div>
-      <div class="window-content">Emulador de Jogos (simulado)</div>
-    </div>
-
-    <!-- Lixeira como janela -->
-    <div class="window" id="win-trash">
-      <div class="window-header">
-        <span class="title">Lixeira</span>
-        <span class="close" onclick="closeWindow('win-trash')">×</span>
-      </div>
-      <div class="window-content">Lixeira vazia</div>
-    </div>
-  </div>
-
-  <!-- Barra de tarefas -->
-  <div id="taskbar">
-    <div class="left">
-      <div id="btn-start" class="task-icon">☰</div>
-    </div>
-    <div id="taskIcons" class="left"></div>
-    <div class="right" id="systemTray">
-      <div id="volume">🔊50%</div>
-      <div id="internet">🌐</div>
-      <div id="clock"></div>
-    </div>
-  </div>
-
-  <!-- Menu Start Elisa -->
-  <div id="start-menu">
-    <div class="start-item" data-win="win-elisa">Elisa</div>
-    <div class="start-item" data-win="win-browser">Navegador</div>
-    <div class="start-item" data-win="win-word">Word</div>
-    <div class="start-item" data-win="win-notes">Notas</div>
-    <div class="start-item" data-win="win-pdf">PDF</div>
-    <div class="start-item" data-win="win-emulator">Emulador</div>
-    <div class="start-item" data-win="win-trash">Lixeira</div>
-  </div>
+<div id="windows-area"></div>
 
 <script>
-  // Funções de janela
-  function openWindow(id) {
-    const w = document.getElementById(id);
-    if (w) {
-      w.style.display = 'flex';
-      addTaskIcon(id);
-    }
-  }
-  function closeWindow(id) {
-    const w = document.getElementById(id);
-    if (w) w.style.display = 'none';
-    removeTaskIcon(id);
-  }
+// Startup PS5
+document.addEventListener("DOMContentLoaded",()=>{
+  const startSound=document.getElementById("ps5-start");
+  startSound.play();
+  startSound.onended=()=>console.log("Startup PS5 completo");
 
-  // Adicionar ícone na taskbar
-  function addTaskIcon(id) {
-    const bar = document.getElementById('taskIcons');
-    if (!document.getElementById('task-' + id)) {
-      const div = document.createElement('div');
-      div.className = 'task-icon';
-      div.id = 'task-' + id;
-      div.innerText = id === 'win-elisa' ? '🤖' : '🗔';
-      div.onclick = () => toggleWindow(id);
-      bar.appendChild(div);
-    }
-  }
-  function removeTaskIcon(id) {
-    const el = document.getElementById('task-' + id);
-    if (el) el.remove();
-  }
-  function toggleWindow(id) {
-    const w = document.getElementById(id);
-    if (w.style.display === 'flex') w.style.display = 'none';
-    else openWindow(id);
-  }
+  // Clock
+  setInterval(()=>document.getElementById("clock").innerText=new Date().toLocaleTimeString(),1000);
 
-  // Start menu
-  document.getElementById('btn-start').onclick = () => {
-    const m = document.getElementById('start-menu');
-    m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-  };
-  document.querySelectorAll('#start-menu .start-item').forEach(item => {
-    item.addEventListener('click', () => {
-      openWindow(item.dataset.win);
-      document.getElementById('start-menu').style.display = 'none';
-    });
-  });
+  // Volume
+  const volSlider=document.getElementById("volume-slider");
+  volSlider.addEventListener("input",()=>document.querySelectorAll("audio").forEach(a=>a.volume=volSlider.value));
 
-  // Relógio
-  function updateClock() {
-    document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  // Arrastar janelas
-  document.querySelectorAll('.window').forEach(win => {
-    const header = win.querySelector('.window-header');
-    let offsetX = 0, offsetY = 0, isDown = false;
-    header.addEventListener('mousedown', e => {
-      isDown = true;
-      offsetX = e.clientX - win.offsetLeft;
-      offsetY = e.clientY - win.offsetTop;
-    });
-    document.addEventListener('mouseup', () => isDown = false);
-    document.addEventListener('mousemove', e => {
-      if (isDown) {
-        win.style.left = (e.clientX - offsetX) + 'px';
-        win.style.top = (e.clientY - offsetY) + 'px';
-      }
-    });
-  });
-
-  // Arrastar ícones (desktop <-> barra)
-  const icons = document.querySelectorAll('.icon');
-  icons.forEach(icon => {
-    icon.addEventListener('mousedown', e => {
-      let shiftX = e.clientX - icon.offsetLeft;
-      let shiftY = e.clientY - icon.offsetTop;
-      icon.classList.add('dragging');
-      function moveAt(pageX, pageY) {
-        icon.style.left = pageX - shiftX + 'px';
-        icon.style.top = pageY - shiftY + 'px';
-      }
-      function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', () => {
-        icon.classList.remove('dragging');
-        document.removeEventListener('mousemove', onMouseMove);
-      }, { once: true });
-    });
-    icon.ondragstart = () => false;
-  });
-
-  // Elisa API placeholder
-  function sendToElisa() {
-    const input = document.getElementById('elisa-input');
-    const messages = document.getElementById('elisa-messages');
-    const text = input.value;
-    if (!text) return;
-    messages.innerHTML += `<div><b>Você:</b> ${text}</div>`;
-    input.value = '';
-    setTimeout(() => {
-      // Aqui você substituiria por chamada real à API
-      messages.innerHTML += `<div><b>Elisa:</b> Esta é uma resposta de teste.</div>`;
-      messages.scrollTop = messages.scrollHeight;
-    }, 800);
+  // Drag function
+  function makeDraggable(el, options={}){
+    el.onmousedown=(e)=>{
+      e.preventDefault();
+      el.classList.add("dragging");
+      let offsetX=e.clientX-el.offsetLeft;
+      let offsetY=e.clientY-el.offsetTop;
+      const moveHandler=(ev)=>{
+        el.style.left=(ev.clientX-offsetX)+"px";
+        el.style.top=(ev.clientY-offsetY)+"px";
+      };
+      const upHandler=()=>{
+        el.classList.remove("dragging");
+        document.removeEventListener("mousemove",moveHandler);
+        document.removeEventListener("mouseup",upHandler);
+        // Move Start icons to desktop
+        if(options.toDesktop && el.classList.contains("start-icon")){
+          el.classList.remove("start-icon");
+          el.classList.add("desktop-icon");
+          document.getElementById("windows-area").appendChild(el);
+        }
+        // Move taskbar icons to desktop
+        if(options.toDesktop && el.classList.contains("taskbar-icon")){
+          el.classList.remove("taskbar-icon");
+          el.classList.add("desktop-icon");
+          document.getElementById("windows-area").appendChild(el);
+        }
+        // Move desktop icons back to taskbar if dragged near bottom
+        if(options.toTaskbar && el.classList.contains("desktop-icon")){
+          const rect=el.getBoundingClientRect();
+          if(rect.top>window.innerHeight-60){
+            el.classList.remove("desktop-icon");
+            el.classList.add("taskbar-icon");
+            el.style.top="0px"; el.style.left="0px";
+            document.getElementById("taskbar").appendChild(el);
+          }
+        }
+      };
+      document.addEventListener("mousemove",moveHandler);
+      document.addEventListener("mouseup",upHandler);
+    };
   }
 
-  // Ícones clicáveis para abrir janelas
-  document.getElementById('icon-elisa').ondblclick = () => openWindow('win-elisa');
-  document.getElementById('icon-browser').ondblclick = () => openWindow('win-browser');
-  document.getElementById('icon-word').ondblclick = () => openWindow('win-word');
-  document.getElementById('icon-notes').ondblclick = () => openWindow('win-notes');
-  document.getElementById('icon-pdf').ondblclick = () => openWindow('win-pdf');
-  document.getElementById('icon-emulator').ondblclick = () => openWindow('win-emulator');
-  document.getElementById('icon-trash').ondblclick = () => openWindow('win-trash');
+  // Apply drag
+  document.querySelectorAll(".start-icon").forEach(icon=>makeDraggable(icon,{toDesktop:true}));
+  document.querySelectorAll(".desktop-icon").forEach(icon=>makeDraggable(icon,{toTaskbar:true}));
+  document.querySelectorAll(".taskbar-icon").forEach(icon=>makeDraggable(icon,{toDesktop:true}));
+
+});
+
+// Start Menu toggle
+function toggleStart(){ const startMenu=document.getElementById("startMenu"); startMenu.style.display=startMenu.style.display==="block"?"none":"block"; }
+// PS5 click
+function playClick(){document.getElementById("ps5-click").play();}
+
+// Open App
+function openApp(app){
+  playClick();
+  let content="";
+  if(app==="browser") content='<iframe src="https://youtube.com" style="width:100%; height:100%; border:0;"></iframe>';
+  if(app==="terminal") content='<div style="color:#0f0;font-family:monospace;padding:20px;">Terminal Elisa</div>';
+  if(app==="elisa") content=`<div style="padding:10px;">
+    <input type="text" id="elisa-question" placeholder="Pergunte algo..." style="width:70%;">
+    <button onclick="askElisa()">Perguntar</button>
+    <div id="elisa-answer" style="margin-top:10px;color:#0f0;"></div>
+  </div>`;
+  if(app==="recycle") content="<div style='padding:20px;'>Lixeira vazia</div>";
+  if(app==="pc") content="<div style='padding:20px;'>Meu PC: Documentos, Downloads, etc.</div>";
+  if(app==="word") content="<div style='padding:20px;'>Word Simulado</div>";
+  if(app==="notepad") content="<div style='padding:20px;'>Notepad Simulado</div>";
+  if(app==="emulator") content="<div style='padding:20px;'>Emulador Simulado</div>";
+
+  const win=document.createElement("div");
+  win.className="window";
+  win.style.top="100px"; win.style.left="100px";
+  win.innerHTML=`<div class="window-header">
+    <div class="window-btns">
+      <div class="window-btn win-min" onclick="minimize(this)"></div>
+      <div class="window-btn win-max" onclick="maximize(this)"></div>
+      <div class="window-btn win-close" onclick="closeWin(this)"></div>
+    </div>
+  </div>
+  <div class="window-content">${content}</div>`;
+  document.getElementById("windows-area").appendChild(win);
+  enableDrag(win);
+}
+
+// Window controls
+function closeWin(btn){btn.closest(".window").remove();}
+function minimize(btn){btn.closest(".window").style.display="none";}
+function maximize(btn){const w=btn.closest(".window"); w.style.top="0"; w.style.left="0"; w.style.width="100%"; w.style.height="calc(100% - 55px)";}
+
+// Window drag
+function enableDrag(el){
+  const header=el.querySelector(".window-header");
+  let dragging=false, offsetX=0, offsetY=0;
+  header.onmousedown=(e)=>{dragging=true; offsetX=e.clientX-el.offsetLeft; offsetY=e.clientY-el.offsetTop; header.style.cursor="grabbing";}
+  document.onmouseup=()=>{dragging=false; header.style.cursor="grab";}
+  document.onmousemove=(e)=>{if(dragging){el.style.left=(e.clientX-offsetX)+"px"; el.style.top=(e.clientY-offsetY)+"px";}}
+}
+
+// Elisa IA placeholder
+async function askElisa(){
+  const question=document.getElementById("elisa-question").value;
+  const answerDiv=document.getElementById("elisa-answer");
+  answerDiv.innerText="Elisa está pensando...";
+  try{
+    const res=await fetch("http://localhost:3000/elisa",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
+    const data=await res.json();
+    answerDiv.innerText=data.answer;
+  }catch(e){answerDiv.innerText="Erro ao conectar Elisa.";}
+}
 </script>
 </body>
 </html>
