@@ -1,390 +1,219 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Elisa OS Web — Versão C (index.html + n64.wasm)</title>
-
-<!-- ===== STYLES (PS5-like, Windows bar) ===== -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elisa OS - Futurista 3D PS5</title>
 <style>
-:root{--panel:rgba(6,24,48,0.86);--accent:#0a84ff;--text:#eaf6ff;--glass:rgba(255,255,255,0.03)}
-*{box-sizing:border-box} html,body,#desktop{height:100%;margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial}
-body{background:#001428;color:var(--text);-webkit-font-smoothing:antialiased}
-#desktop{display:flex;height:100vh;
-  background:
-    url('/mnt/data/14144D53-06C3-400A-815D-16A3316DF6BC.png') center/cover no-repeat,
-    linear-gradient(180deg,#001428,#001824);
-  gap:0;
+/* Reset */
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif;}
+html, body {width:100%; height:100%; overflow:hidden; background:#0b0b0f; color:white; perspective:1200px;}
+
+/* Desktop futurista */
+#desktop {
+  width:100%; height:100%; position:relative; background:linear-gradient(135deg,#0f0f13,#1c1c28);
 }
-.sidebar{width:220px;background:var(--panel);padding:16px;color:var(--text);display:flex;flex-direction:column;gap:10px;border-right:1px solid rgba(255,255,255,0.03)}
-.logo{font-weight:700;font-size:18px}
-.sb-btn{padding:10px;border-radius:8px;border:none;background:transparent;color:var(--text);text-align:left;cursor:pointer}
-.sb-btn:hover{background:rgba(255,255,255,0.02)}
-.windows{flex:1;position:relative;padding:18px;overflow:hidden}
-.window{position:absolute;width:920px;height:600px;top:40px;left:240px;background:linear-gradient(180deg, rgba(8,16,32,0.95), rgba(3,8,15,0.95));border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column}
-.w-titlebar{height:48px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-top-left-radius:12px;border-top-right-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent)}
-.w-title{font-weight:600;color:var(--text)}
-.w-controls button{margin-left:8px;padding:6px 8px;background:transparent;border:none;color:var(--text);cursor:pointer;border-radius:6px}
-.w-content{flex:1;padding:12px;color:var(--text);overflow:auto}
-.taskbar{position:fixed;left:0;right:0;bottom:0;height:56px;background:var(--panel);display:flex;align-items:center;gap:12px;padding:6px 12px;border-top:1px solid rgba(255,255,255,0.03)}
-.startbtn{width:44px;height:44px;border-radius:8px;background:var(--glass);display:flex;align-items:center;justify-content:center;cursor:pointer}
-.task-icons{display:flex;gap:8px;align-items:center}
-.task-item{padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:8px;color:var(--text);cursor:pointer}
-.clock{margin-left:auto;color:var(--text);opacity:0.9;padding-right:8px}
-.minimized{display:none}
-.file-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
-.btn{padding:6px 10px;border-radius:6px;border:none;background:var(--accent);color:white;cursor:pointer}
-.small{padding:4px 8px;font-size:13px;border-radius:6px;background:rgba(255,255,255,0.02);border:none;color:var(--text)}
-.notice{font-size:12px;opacity:0.85}
-@media(max-width:900px){.window{width:90%;left:5%;top:80px;height:60vh}.sidebar{display:none}}
+
+/* Área de trabalho ícones */
+.desktop-icon {
+  width:60px; text-align:center; margin:15px; cursor:pointer; transition:0.2s;
+  position:absolute;
+}
+.desktop-icon img {width:50px; height:50px; display:block; margin:0 auto;}
+.desktop-icon:hover {transform:scale(1.1) rotateY(10deg);}
+
+/* Janelas futuristas */
+.window {
+  position:absolute; top:100px; left:100px; width:600px; height:400px; background:rgba(30,30,45,0.95);
+  border-radius:15px; box-shadow:0 0 60px rgba(0,255,255,0.5); display:flex; flex-direction:column; transform-style: preserve-3d;
+  transition:transform 0.3s, box-shadow 0.3s;
+}
+.window:hover {box-shadow:0 0 80px cyan; transform:translateZ(20px);}
+.window-header {
+  height:40px; background:rgba(50,50,70,0.95); display:flex; align-items:center;
+  justify-content:space-between; padding:0 10px; cursor:grab;
+}
+.window-title {font-weight:bold; color:#00ffff;}
+.window-controls {display:flex; gap:5px;}
+.window-controls div {
+  width:20px; height:20px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-weight:bold; font-size:14px; color:black; transition:0.2s;
+}
+.close {background:#ff5f56;} .minimize {background:#ffbd2e;} .maximize {background:#27c93f;}
+.window-content {flex:1; background:rgba(15,15,25,0.95); padding:10px; overflow:auto;}
+
+/* Barra de tarefas inferior */
+#taskbar {
+  position:absolute; bottom:0; left:0; width:100%; height:50px; background:rgba(20,20,30,0.9);
+  display:flex; justify-content:space-between; align-items:center; padding:0 10px; border-top:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px);
+}
+#taskbar-left,#taskbar-center,#taskbar-right {display:flex; align-items:center; gap:10px;}
+.task-icon {width:35px; height:35px; display:flex; align-items:center; justify-content:center;
+ background:rgba(255,255,255,0.1); border-radius:8px; cursor:pointer; transition:0.2s;}
+.task-icon:hover {background:rgba(255,255,255,0.25);}
+
+/* Menu Start lateral */
+#start-menu {
+  position:absolute; bottom:50px; left:10px; width:260px; height:400px; background:rgba(20,20,40,0.95);
+  border-radius:15px; display:none; flex-direction:column; padding:10px; box-shadow:0 0 40px cyan;
+}
+
+/* Widgets */
+#widgets {position:absolute; top:10px; right:10px; display:flex; gap:10px;}
+.widget {background:rgba(20,20,40,0.8); padding:10px; border-radius:10px; box-shadow:0 0 25px cyan; text-align:center;}
 </style>
 </head>
 <body>
-  <div id="desktop">
-    <div class="sidebar" id="sidebar">
-      <div class="logo">Elisa OS Web</div>
-      <button class="sb-btn" data-open="file-manager">📁 Explorador</button>
-      <button class="sb-btn" data-open="image-viewer">🖼 Visualizador de Imagens</button>
-      <button class="sb-btn" data-open="music-player">🎵 Player de Música</button>
-      <button class="sb-btn" data-open="pdf-doc">📄 PDF / DOCX</button>
-      <button class="sb-btn" data-open="editor">📝 Editor</button>
-      <button class="sb-btn" data-open="emulators">🎮 Emuladores</button>
-      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:8px 0"/>
-      <button class="sb-btn" id="wallpaperBtn">🎨 Trocar papel de parede</button>
-      <div class="notice">Desktop otimizado para Desktop (Chrome/Edge/Firefox). Para melhor N64, adicione n64.wasm ao mesmo diretório.</div>
+<div id="desktop">
+  <!-- Desktop Icons -->
+  <div class="desktop-icon" id="icon-my-computer" style="top:20px; left:20px;">
+    <img src="https://cdn-icons-png.flaticon.com/512/32/32441.png" alt="Meu Computador"><div>Meu Computador</div>
+  </div>
+  <div class="desktop-icon" id="icon-documents" style="top:20px; left:100px;">
+    <img src="https://cdn-icons-png.flaticon.com/512/136/136524.png"><div>Documentos</div>
+  </div>
+  <div class="desktop-icon" id="icon-downloads" style="top:20px; left:180px;">
+    <img src="https://cdn-icons-png.flaticon.com/512/724/724933.png"><div>Downloads</div>
+  </div>
+  <div class="desktop-icon" id="icon-browser" style="top:120px; left:20px;">
+    <img src="https://cdn-icons-png.flaticon.com/512/888/888853.png"><div>Navegador</div>
+  </div>
+  <div class="desktop-icon" id="icon-elisa" style="top:120px; left:100px;">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712583.png"><div>Elisa</div>
+  </div>
+
+  <!-- Windows -->
+  <div class="window" id="window-browser" style="display:none;">
+    <div class="window-header">
+      <div class="window-title">Navegador</div>
+      <div class="window-controls">
+        <div class="minimize">-</div>
+        <div class="maximize">□</div>
+        <div class="close">×</div>
+      </div>
     </div>
+    <iframe id="browser" src="https://www.google.com" style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
+  </div>
 
-    <div class="windows" id="windows"></div>
-
-    <div class="taskbar" id="taskbar">
-      <div class="startbtn" id="startbtn">≡</div>
-      <div class="task-icons" id="task-icons"></div>
-      <div class="clock" id="clock"></div>
+  <div class="window" id="window-elisa" style="display:none;">
+    <div class="window-header">
+      <div class="window-title">Elisa AI</div>
+      <div class="window-controls">
+        <div class="minimize">-</div>
+        <div class="maximize">□</div>
+        <div class="close">×</div>
+      </div>
+    </div>
+    <div class="window-content">
+      <p>Olá! Pergunte algo à Elisa:</p>
+      <input type="text" id="elisa-input" placeholder="Digite aqui..." style="width:95%; padding:5px;">
+      <button id="elisa-send">Enviar</button>
+      <div id="elisa-response"></div>
     </div>
   </div>
 
-  <!-- Template janela -->
-  <template id="window-template">
-    <div class="window">
-      <div class="w-titlebar">
-        <span class="w-title"></span>
-        <div class="w-controls">
-          <button class="w-min">—</button>
-          <button class="w-close">✕</button>
-        </div>
-      </div>
-      <div class="w-content"></div>
+  <!-- Barra de tarefas -->
+  <div id="taskbar">
+    <div id="taskbar-left">
+      <div class="task-icon" id="btn-start">☰</div>
     </div>
-  </template>
+    <div id="taskbar-center"></div>
+    <div id="taskbar-right">
+      <div class="task-icon" id="widget-clock">00:00</div>
+      <div class="task-icon" id="widget-date">--/--/----</div>
+      <div class="task-icon" id="widget-network">🌐</div>
+      <div class="task-icon" id="widget-volume">🔊</div>
+    </div>
+  </div>
 
-  <!-- CDNs: jsnes (NES), pdf.js, mammoth -->
-  <script src="https://cdn.jsdelivr.net/npm/jsnes@0.2.0/dist/jsnes.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
+  <!-- Menu Start -->
+  <div id="start-menu">
+    <div class="desktop-icon" id="start-browser">
+      <img src="https://cdn-icons-png.flaticon.com/512/888/888853.png"><div>Navegador</div>
+    </div>
+    <div class="desktop-icon" id="start-elisa">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712583.png"><div>Elisa AI</div>
+    </div>
+  </div>
+
+  <!-- Widgets -->
+  <div id="widgets">
+    <div class="widget" id="widget-climate">☀️ 25°C</div>
+  </div>
+</div>
 
 <script>
-/* ========== IndexedDB helpers ========== */
-function idbOpen(){ return new Promise((res,rej)=>{ const r=indexedDB.open('elisa_fs',1); r.onupgradeneeded = ()=>{ const db=r.result; if(!db.objectStoreNames.contains('files')) db.createObjectStore('files'); }; r.onsuccess = ()=> res(r.result); r.onerror = ()=> rej(r.error); });}
-async function idbPut(k,v){ const db = await idbOpen(); return new Promise((res,rej)=>{ const tx = db.transaction('files','readwrite'); tx.objectStore('files').put(v,k); tx.oncomplete = ()=> res(true); tx.onerror = ()=> rej(tx.error); });}
-async function idbGet(k){ const db = await idbOpen(); return new Promise((res,rej)=>{ const tx = db.transaction('files','readonly'); const req = tx.objectStore('files').get(k); req.onsuccess = ()=> res(req.result); req.onerror = ()=> rej(req.error); });}
-async function idbDelete(k){ const db = await idbOpen(); return new Promise((res,rej)=>{ const tx = db.transaction('files','readwrite'); tx.objectStore('files').delete(k); tx.oncomplete = ()=> res(true); tx.onerror = ()=> rej(tx.error); });}
-async function idbList(){ const db = await idbOpen(); return new Promise((res,rej)=>{ const tx = db.transaction('files','readonly'); const cur = tx.objectStore('files').openCursor(); const out=[]; cur.onsuccess = ()=> { const c = cur.result; if(!c){ res(out); return; } out.push(c.key); c.continue(); }; cur.onerror = ()=> rej(cur.error); });}
-
-/* ========== Window manager ========== */
-const tpl = document.getElementById('window-template');
-const windowsRoot = document.getElementById('windows');
-const taskIcons = document.getElementById('task-icons');
-let zIndex = 10;
-function createWindow(title, contentEl, opts={}) {
-  const node = tpl.content.firstElementChild.cloneNode(true);
-  const w = node;
-  w.querySelector('.w-title').textContent = title;
-  const content = w.querySelector('.w-content');
-  content.innerHTML = '';
-  content.appendChild(contentEl);
-  windowsRoot.appendChild(w);
-  makeDraggable(w);
-  registerControls(w);
-  addTaskButton(title, w);
-  if(opts.left) w.style.left = opts.left + 'px';
-  if(opts.top) w.style.top = opts.top + 'px';
-  w.style.zIndex = (++zIndex);
-  return w;
-}
-function addTaskButton(title, winEl){
-  const b = document.createElement('div'); b.className = 'task-item'; b.textContent = title;
-  b.onclick = ()=> toggleMinimize(winEl);
-  taskIcons.appendChild(b);
-  winEl._taskBtn = b;
-}
-function toggleMinimize(winEl){
-  if(winEl.classList.contains('minimized')){ winEl.classList.remove('minimized'); winEl.style.zIndex = (++zIndex); }
-  else winEl.classList.add('minimized');
-}
-function registerControls(w){
-  w.querySelector('.w-min').onclick = ()=> toggleMinimize(w);
-  w.querySelector('.w-close').onclick = ()=> { if(w._taskBtn) w._taskBtn.remove(); w.remove(); };
-  w.onclick = ()=> w.style.zIndex = (++zIndex);
-}
-function makeDraggable(el){
-  const bar = el.querySelector('.w-titlebar');
-  let dragging=false, sx=0, sy=0, ox=0, oy=0;
-  bar.addEventListener('pointerdown', (e)=>{ dragging=true; sx=e.clientX; sy=e.clientY; ox=el.offsetLeft; oy=el.offsetTop; el.setPointerCapture && el.setPointerCapture(e.pointerId); });
-  bar.addEventListener('pointermove', (e)=>{ if(!dragging) return; const nx = ox + (e.clientX - sx); const ny = oy + (e.clientY - sy); el.style.left = nx + 'px'; el.style.top = ny + 'px'; });
-  bar.addEventListener('pointerup', (e)=>{ dragging=false; try{ el.releasePointerCapture(e.pointerId); } catch(e){} });
-}
-
-/* ========== Apps ========== */
-
-/* --- File manager --- */
-function makeFileManager(){
-  const root = document.createElement('div'); root.style.display='flex'; root.style.flexDirection='column'; root.style.height='100%';
-  const toolbar = document.createElement('div'); toolbar.style.marginBottom='8px';
-  const upload = document.createElement('input'); upload.type='file';
-  upload.onchange = async (ev)=>{ const f = ev.target.files[0]; if(!f) return; const arr = await f.arrayBuffer(); await idbPut('file:'+f.name, {name:f.name,type:f.type,data:arr}); refresh(); };
-  const newBtn = document.createElement('button'); newBtn.className='btn'; newBtn.textContent='Novo TXT'; newBtn.onclick = async ()=>{ const name = prompt('Nome do arquivo (ex: nota.txt)') || 'nota.txt'; await idbPut('file:'+name, {name,type:'text/plain',data:new TextEncoder().encode('')}); refresh(); };
-  toolbar.appendChild(upload); toolbar.appendChild(newBtn); root.appendChild(toolbar);
-
-  const list = document.createElement('div'); list.style.flex='1'; list.style.overflow='auto';
-  async function refresh(){
-    list.innerHTML=''; const keys = await idbList(); const files = keys.filter(k=>k.startsWith('file:'));
-    if(files.length===0){ list.innerHTML='<i>Nenhum arquivo salvo</i>'; return; }
-    for(const k of files){
-      const meta = await idbGet(k);
-      const row = document.createElement('div'); row.className='file-row';
-      const name = document.createElement('div'); name.textContent = meta.name;
-      const actions = document.createElement('div');
-      const open = document.createElement('button'); open.className='small'; open.textContent='Abrir'; open.onclick = ()=> openFile(meta);
-      const dl = document.createElement('button'); dl.className='small'; dl.textContent='Baixar'; dl.onclick = ()=> downloadMeta(meta);
-      const del = document.createElement('button'); del.className='small'; del.textContent='Apagar'; del.onclick = async ()=>{ await idbDelete(k); refresh(); };
-      actions.appendChild(open); actions.appendChild(dl); actions.appendChild(del);
-      row.appendChild(name); row.appendChild(actions);
-      list.appendChild(row);
+// Drag windows
+function makeDraggable(win){
+  const header = win.querySelector('.window-header');
+  let isDragging=false, offsetX, offsetY;
+  header.addEventListener('mousedown', e=>{
+    isDragging=true;
+    offsetX=e.clientX - win.offsetLeft;
+    offsetY=e.clientY - win.offsetTop;
+    win.style.transition='none';
+  });
+  document.addEventListener('mouseup', ()=>{isDragging=false; win.style.transition='transform 0.2s';});
+  document.addEventListener('mousemove', e=>{
+    if(isDragging){
+      win.style.left=(e.clientX-offsetX)+'px';
+      win.style.top=(e.clientY-offsetY)+'px';
     }
-  }
-
-  async function openFile(meta){
-    const lower = meta.name.toLowerCase();
-    if(meta.type && meta.type.startsWith('image/')){ const blob = new Blob([meta.data], {type:meta.type}); const url = URL.createObjectURL(blob); const img = document.createElement('img'); img.src = url; img.style.maxWidth='100%'; createWindow(meta.name, img); }
-    else if(lower.endsWith('.pdf')){ const blob = new Blob([meta.data], {type:'application/pdf'}); renderPDFBlob(blob, meta.name); }
-    else if(lower.endsWith('.docx')){ const blob = new Blob([meta.data], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}); renderDocxBlob(blob, meta.name); }
-    else if(lower.endsWith('.nes') || lower.startsWith('rom:')){ await idbPut('rom:'+meta.name, {name:meta.name,type:meta.type,data:meta.data}); createWindow('Info', document.createTextNode('ROM salva em Meus ROMs. Abra Emuladores → Meus ROMs para jogar.')); }
-    else { let text=''; try{ text = new TextDecoder().decode(meta.data); }catch(e){ text='[binário]'; } const ta = document.createElement('textarea'); ta.style.width='100%'; ta.style.height='100%'; ta.value = text; const save = document.createElement('button'); save.className='btn'; save.textContent='Salvar'; save.onclick = async ()=>{ const bytes = new TextEncoder().encode(ta.value); await idbPut('file:'+meta.name, {name:meta.name,type:'text/plain',data:bytes}); alert('Salvo.'); }; const box = document.createElement('div'); box.style.height='100%'; box.style.display='flex'; box.style.flexDirection='column'; box.appendChild(ta); box.appendChild(save); createWindow(meta.name, box); }
-  }
-
-  function downloadMeta(meta){ const blob = new Blob([meta.data], {type:meta.type||'application/octet-stream'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = meta.name; document.body.appendChild(a); a.click(); a.remove(); }
-
-  root.appendChild(list); refresh(); return root;
+  });
 }
+document.querySelectorAll('.window').forEach(w=>makeDraggable(w));
 
-/* --- PDF / DOCX helpers --- */
-async function renderPDFBlob(blob, title){
-  const buf = await blob.arrayBuffer(); const pdf = await pdfjsLib.getDocument({data:buf}).promise;
-  const container = document.createElement('div'); container.style.height='100%'; container.style.overflow='auto';
-  for(let i=1;i<=pdf.numPages;i++){ const page = await pdf.getPage(i); const scale = 1.2; const viewport = page.getViewport({scale}); const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); canvas.width = viewport.width; canvas.height = viewport.height; await page.render({canvasContext:ctx,viewport}).promise; container.appendChild(canvas); }
-  createWindow(title, container);
-}
-async function renderDocxBlob(blob, title){
-  const arrayBuffer = await blob.arrayBuffer(); const result = await mammoth.convertToHtml({arrayBuffer}); const div = document.createElement('div'); div.innerHTML = result.value; div.style.padding='8px'; createWindow(title, div);
-}
-
-/* --- Music player --- */
-function makeMusicPlayer(){
-  const root = document.createElement('div'); root.style.display='flex'; root.style.flexDirection='column'; root.style.height='100%';
-  const input = document.createElement('input'); input.type='file'; input.accept='audio/*';
-  const audio = document.createElement('audio'); audio.controls = true; audio.style.width = '100%';
-  input.onchange = async (e)=>{ const f = e.target.files[0]; if(!f) return; const arr = await f.arrayBuffer(); await idbPut('file:'+f.name,{name:f.name,type:f.type,data:arr}); audio.src = URL.createObjectURL(new Blob([arr],{type:f.type})); audio.play().catch(()=>{}); };
-  root.appendChild(document.createTextNode('Carregar música (salva localmente):')); root.appendChild(input); root.appendChild(audio);
-  return root;
-}
-
-/* --- Editor --- */
-function makeEditor(){
-  const box = document.createElement('div'); box.style.display='flex'; box.style.flexDirection='column'; box.style.height='100%';
-  const ed = document.createElement('div'); ed.contentEditable = true; ed.style.flex='1'; ed.style.border='1px solid rgba(255,255,255,0.04)'; ed.style.padding='8px'; ed.style.background='rgba(0,0,0,0.12)'; ed.style.overflow='auto';
-  const save = document.createElement('button'); save.className='btn'; save.textContent='Salvar como HTML'; save.onclick = async ()=>{ const name = prompt('Nome do documento (ex: doc.html)') || 'doc.html'; await idbPut('file:'+name, {name,type:'text/html',data:new TextEncoder().encode(ed.innerHTML)}); alert('Salvo: '+name); };
-  box.appendChild(ed); box.appendChild(save); return box;
-}
-
-/* --- Emulators --- */
-function makeEmulators(){
-  const root = document.createElement('div'); root.style.display='flex'; root.style.flexDirection='column'; root.style.gap='8px';
-  root.innerHTML = '<p>Catálogo de ROMs (homebrew/public-domain) + Upload local. NES via jsnes (CDN). Para SNES/N64 você pode carregar cores WASM (upload).</p>';
-
-  const addPublicBtn = document.createElement('button'); addPublicBtn.className='btn'; addPublicBtn.textContent='Adicionar ROM pública (URL)';
-  addPublicBtn.onclick = ()=>{
-    const url = prompt('Cole URL direto para .nes/.smc/.z64 etc (somente arquivos públicos / homebrew).');
-    if(!url) return;
-    (async ()=>{
-      try{
-        const resp = await fetch(url);
-        if(!resp.ok) throw new Error('HTTP '+resp.status);
-        const buf = await resp.arrayBuffer();
-        let name = url.split('/').pop().split('?')[0] || ('public-rom-'+Date.now());
-        await idbPut('rom:'+name, {name, type:resp.headers.get('Content-Type')||'application/octet-stream', data:buf});
-        alert('ROM pública salva: '+name);
-        loadList();
-      }catch(e){ alert('Falha ao baixar ROM: '+e.message); console.error(e); }
-    })();
-  };
-
-  const romInput = document.createElement('input'); romInput.type='file'; romInput.accept='.nes,.smc,.sfc,.z64,.n64,.v64,.gba,.gb,.gbc,.zip';
-  romInput.onchange = async (e)=>{ const f = e.target.files[0]; if(!f) return; const arr = await f.arrayBuffer(); await idbPut('rom:'+f.name, {name:f.name,type:f.type,data:arr}); alert('ROM salva: '+f.name); loadList(); };
-
-  const coreInput = document.createElement('input'); coreInput.type='file'; coreInput.accept='.wasm'; coreInput.onchange = async (e)=>{ const f = e.target.files[0]; if(!f) return; const arr = await f.arrayBuffer(); await idbPut('core:'+f.name, {name:f.name,type:f.type,data:arr}); alert('Core WASM salvo: '+f.name); loadCores(); };
-
-  const romList = document.createElement('div'); romList.style.maxHeight='300px'; romList.style.overflow='auto'; romList.style.border='1px dashed rgba(255,255,255,0.03)'; romList.style.padding='8px';
-  const coreList = document.createElement('div');
-
-  const gpStatus = document.createElement('div'); gpStatus.className='notice'; gpStatus.textContent='Gamepad: desconectado';
-  const gpMapBtn = document.createElement('button'); gpMapBtn.className='small'; gpMapBtn.textContent='Configurar gamepad (básico)';
-  gpMapBtn.onclick = ()=> alert('Conecte o controle e pressione os botões no jogo. Mapeamento avançado pode ser adicionado.');
-
-  root.appendChild(addPublicBtn);
-  root.appendChild(document.createTextNode('Upload ROM local:')); root.appendChild(romInput); root.appendChild(romList);
-  root.appendChild(document.createElement('hr'));
-  root.appendChild(document.createTextNode('Upload core WASM (ex: n64 core wasm):')); root.appendChild(coreInput); root.appendChild(coreList);
-  root.appendChild(document.createElement('hr'));
-  root.appendChild(gpStatus); root.appendChild(gpMapBtn);
-
-  async function loadList(){
-    romList.innerHTML=''; const keys = await idbList(); const romKeys = keys.filter(k=>k.startsWith('rom:'));
-    if(romKeys.length===0){ romList.innerHTML='<i>Nenhuma ROM salva</i>'; return; }
-    for(const k of romKeys){
-      const meta = await idbGet(k);
-      const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='6px 0';
-      const name = document.createElement('div'); name.textContent = meta.name;
-      const actions = document.createElement('div');
-      const play = document.createElement('button'); play.className='small'; play.textContent='▶ Jogar'; play.onclick = ()=> runROM(meta);
-      const dl = document.createElement('button'); dl.className='small'; dl.textContent='Baixar'; dl.onclick = ()=> { const blob = new Blob([meta.data], {type:meta.type||'application/octet-stream'}); const a=document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = meta.name; document.body.appendChild(a); a.click(); a.remove(); };
-      const del = document.createElement('button'); del.className='small'; del.textContent='🗑'; del.onclick = async ()=>{ await idbDelete(k); loadList(); };
-      actions.appendChild(play); actions.appendChild(dl); actions.appendChild(del);
-      row.appendChild(name); row.appendChild(actions); romList.appendChild(row);
-    }
-  }
-
-  async function loadCores(){
-    coreList.innerHTML=''; const keys = await idbList(); const coreKeys = keys.filter(k=>k.startsWith('core:'));
-    if(coreKeys.length===0){ coreList.innerHTML='<i>Sem cores WASM salvos</i>'; return; }
-    for(const k of coreKeys){ const c = await idbGet(k); const d = document.createElement('div'); d.textContent = c.name; coreList.appendChild(d); }
-  }
-
-  /* --- runROM: NES via jsnes; SNES/N64 show instructions or attempt WASM core load --- */
-  async function runROM(meta){
-    const lower = meta.name.toLowerCase();
-    if(lower.endsWith('.nes')){
-      if(typeof jsnes === 'undefined' && typeof window.NES === 'undefined'){ createWindow('Erro NES', document.createTextNode('jsnes não carregado (ver console).')); return; }
-      const canvas = document.createElement('canvas'); canvas.width=256; canvas.height=240; canvas.style.width='100%'; canvas.style.height='100%';
-      const info = document.createElement('div'); info.textContent = 'NES: ' + meta.name; info.style.marginBottom='6px';
-      const container = document.createElement('div'); container.style.height='100%'; container.style.display='flex'; container.style.flexDirection='column'; container.appendChild(info); container.appendChild(canvas);
-      createWindow('NES: '+meta.name, container, {left:120, top:80});
-      try{
-        const romBytes = new Uint8Array(meta.data);
-        let bin = ''; for(let i=0;i<romBytes.length;i++) bin += String.fromCharCode(romBytes[i]);
-        const NESCls = (window.jsnes && window.jsnes.NES) ? window.jsnes.NES : (window.NES ? window.NES : window.jsnes);
-        if(!NESCls){ createWindow('Erro', document.createTextNode('Construtor jsnes não encontrado')); return; }
-        const nes = new NESCls({ onFrame: function(frame){ const ctx = canvas.getContext('2d'); const image = ctx.getImageData(0,0,256,240); for(let i=0;i<frame.length;i++){ const c = frame[i]; image.data[i*4+0] = (c>>16)&0xFF; image.data[i*4+1] = (c>>8)&0xFF; image.data[i*4+2] = c&0xFF; image.data[i*4+3] = 255; } ctx.putImageData(image,0,0); }, emulateAudio:false });
-        try{ nes.loadROM(bin); } catch(e){ try{ nes.loadROM(romBytes); } catch(err){ console.error(err); createWindow('Erro ROM', document.createTextNode('Falha ao carregar ROM (veja console)')); return; } }
-        // keyboard mapping
-        window.addEventListener('keydown', (ev)=>{ const map={'ArrowUp':'up','ArrowDown':'down','ArrowLeft':'left','ArrowRight':'right','z':'A','x':'B','Enter':'start','Shift':'select'}; const k = ev.key.length===1?ev.key.toLowerCase():ev.key; const m = map[k]; if(m && nes.buttonDown) nes.buttonDown(1,m); });
-        window.addEventListener('keyup', (ev)=>{ const map={'ArrowUp':'up','ArrowDown':'down','ArrowLeft':'left','ArrowRight':'right','z':'A','x':'B','Enter':'start','Shift':'select'}; const k = ev.key.length===1?ev.key.toLowerCase():ev.key; const m = map[k]; if(m && nes.buttonUp) nes.buttonUp(1,m); });
-      }catch(err){ console.error(err); createWindow('Erro', document.createTextNode('Erro ao rodar ROM NES.')); }
-    } else if(lower.endsWith('.smc')||lower.endsWith('.sfc')){
-      createWindow('SNES', document.createTextNode('SNES detectado. Para rodar SNES em fullspeed, faça upload de um core WASM (ex: snes9x wasm) via Upload core WASM acima. Após carregar o core, o sistema tentará executar a ROM.'));
-    } else if(lower.endsWith('.z64')||lower.endsWith('.n64')||lower.endsWith('.v64')){
-      // N64: try to load core from local file 'n64.wasm' (optionally saved as core:... in IndexedDB)
-      createWindow('N64', document.createTextNode('N64 detectada. O sistema tentará localizar um core WASM (n64.wasm) no mesmo diretório ou via cores salvos. Se não existir, faça upload do core (Upload core WASM).'));
-      // Note: integration with a specific N64 WASM core requires core-specific boot code. This starter provides the UI and a simple attempt to instantiate a wasm module if available, but real core wiring depends on the specific core API.
-      tryInitN64CoreAndRun(meta);
-    } else {
-      createWindow('Formato não suportado', document.createTextNode('Formato não suportado para execução direta.'));
-    }
-  }
-
-  /* ========== Attempt to init N64 core (generic) and run ROM (best-effort) ========== */
-  async function tryInitN64CoreAndRun(meta){
-    // Try cores in IndexedDB first
-    const keys = await idbList();
-    const coreKey = keys.find(k => k.startsWith('core:')) || null;
-    let coreBuf = null;
-    if(coreKey){
-      const c = await idbGet(coreKey);
-      coreBuf = c.data;
-    } else {
-      // try fetch n64.wasm from same dir (option C expects file n64.wasm next to index.html)
-      try{
-        const resp = await fetch('n64.wasm'); // user must upload n64.wasm
-        if(resp.ok){
-          coreBuf = await resp.arrayBuffer();
-        }
-      }catch(e){
-        console.log('n64.wasm not fetched', e);
-      }
-    }
-
-    if(!coreBuf){
-      createWindow('N64 core ausente', document.createTextNode('Core WASM N64 não encontrado. Faça upload do core .wasm ou coloque n64.wasm no mesmo diretório do index.html.'));
-      return;
-    }
-
-    // instantiate wasm (generic)
-    try{
-      const module = await WebAssembly.compile(coreBuf);
-      const instance = await WebAssembly.instantiate(module, {});
-      console.log('N64 core instantiated (generic) — instance:', instance);
-      // NOTE: real cores require special APIs (memory, env functions, file system). Implementing full mupen64plus/libretro wrapper is beyond single-file starter.
-      createWindow('N64 core carregado (genérico)', document.createTextNode('Core WASM carregado. Para rodar a ROM N64 de forma real, o core precisa de um shim/loader específico (posso ajudar a integrar um core libretro WASM se você fornecer um core compatível).'));
-    }catch(err){
-      console.error('Erro instanciando core WASM:', err);
-      createWindow('Erro core WASM', document.createTextNode('Falha ao instanciar core WASM (veja console). O core pode exigir bindings/arquivo adicional.'));
-    }
-  }
-
-  /* --- gamepad detection (status) --- */
-  function updateGamepadStatus(){
-    const gps = navigator.getGamepads ? navigator.getGamepads() : [];
-    const gp = gps && gps[0] ? gps[0] : null;
-    gpStatus.textContent = gp ? ('Gamepad: ' + (gp.id || 'Conectado')) : 'Gamepad: desconectado';
-    requestAnimationFrame(updateGamepadStatus);
-  }
-  updateGamepadStatus();
-
-  loadList(); loadCores();
-  return root;
-}
-
-/* ========== UI wiring ========== */
-document.querySelectorAll('.sb-btn').forEach(btn => {
-  btn.onclick = () => {
-    const app = btn.dataset.open;
-    if(app === 'file-manager') createWindow('Explorador', makeFileManager());
-    if(app === 'image-viewer') createWindow('Visualizador de Imagens', (function(){ const d=document.createElement('div'); d.innerHTML='<i>Abra imagens pelo Explorador</i>'; return d; })());
-    if(app === 'music-player') createWindow('Player de Música', makeMusicPlayer());
-    if(app === 'pdf-doc') createWindow('PDF / DOCX', (function(){ const d=document.createElement('div'); d.innerHTML='<i>Abra PDFs / DOCX via Explorador</i>'; return d; })());
-    if(app === 'editor') createWindow('Editor', makeEditor());
-    if(app === 'emulators') createWindow('Emuladores', makeEmulators());
-  };
+// Close windows
+document.querySelectorAll('.window .close').forEach(btn=>{
+  btn.addEventListener('click',()=>{btn.closest('.window').style.display='none';});
 });
 
-/* wallpaper */
-document.getElementById('wallpaperBtn').onclick = ()=> {
-  const url = prompt('Cole URL da imagem de fundo (ou deixe em branco para manter local)');
-  if(url) document.getElementById('desktop').style.backgroundImage = `url('${url}')`;
-};
-
-/* clock */
-setInterval(()=> document.getElementById('clock').textContent = new Date().toLocaleTimeString(), 1000);
-
-/* shortcuts */
-document.addEventListener('keydown', (e)=> {
-  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); alert('Use o botão Salvar no Editor para salvar localmente.'); }
-  if(e.ctrlKey && e.altKey && e.key.toLowerCase() === 'delete'){ createWindow('Ctrl+Alt+Del', document.createTextNode('Simulação: feche apps manualmente ou recarregue a página.')); }
+// Start menu
+const btnStart=document.getElementById('btn-start');
+const startMenu=document.getElementById('start-menu');
+btnStart.addEventListener('click', ()=>{
+  startMenu.style.display=startMenu.style.display==='flex'?'none':'flex';
+  startMenu.style.flexDirection='column';
 });
 
-/* final log */
-console.log('Elisa OS Web (versão C) carregado. Coloque n64.wasm no mesmo diretório para habilitar cores N64 (ou use Upload core WASM).');
+// Desktop icons
+document.getElementById('icon-browser').addEventListener('click', ()=>document.getElementById('window-browser').style.display='flex');
+document.getElementById('start-browser').addEventListener('click', ()=>document.getElementById('window-browser').style.display='flex');
+document.getElementById('icon-elisa').addEventListener('click', ()=>document.getElementById('window-elisa').style.display='flex');
+document.getElementById('start-elisa').addEventListener('click', ()=>document.getElementById('window-elisa').style.display='flex');
 
+// Clock and Date
+function updateClock(){
+  const now=new Date();
+  document.getElementById('widget-clock').innerText=now.toLocaleTimeString();
+  document.getElementById('widget-date').innerText=now.toLocaleDateString();
+}
+setInterval(updateClock,1000);
+
+// Elisa API integration (simulação inicial)
+document.getElementById('elisa-send').addEventListener('click', async ()=>{
+  const question=document.getElementById('elisa-input').value;
+  const responseElisa=document.getElementById('elisa-response');
+  responseElisa.innerText='Elisa está processando...';
+  
+  // Simulação de API real (substituir URL pela real)
+  try{
+    const res=await fetch(`https://api.openai.com/v1/chat/completions`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer SEU_TOKEN_AQUI'
+      },
+      body:JSON.stringify({
+        model:"gpt-3.5-turbo",
+        messages:[{role:"user", content:question}]
+      })
+    });
+    const data=await res.json();
+    responseElisa.innerText=data.choices[0].message.content;
+  }catch(e){responseElisa.innerText='Erro ao conectar com a Elisa API.';}
+  document.getElementById('elisa-input').value='';
+});
 </script>
 </body>
 </html>
