@@ -3,217 +3,295 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elisa OS - Futurista 3D PS5</title>
+<title>Elisa OS 3.0 Futurista PS5</title>
 <style>
-/* Reset */
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif;}
-html, body {width:100%; height:100%; overflow:hidden; background:#0b0b0f; color:white; perspective:1200px;}
+  /* Reset básico */
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
-/* Desktop futurista */
-#desktop {
-  width:100%; height:100%; position:relative; background:linear-gradient(135deg,#0f0f13,#1c1c28);
-}
+  body {
+    background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
+    overflow: hidden;
+    color: #fff;
+  }
 
-/* Área de trabalho ícones */
-.desktop-icon {
-  width:60px; text-align:center; margin:15px; cursor:pointer; transition:0.2s;
-  position:absolute;
-}
-.desktop-icon img {width:50px; height:50px; display:block; margin:0 auto;}
-.desktop-icon:hover {transform:scale(1.1) rotateY(10deg);}
+  /* Área de trabalho */
+  #desktop {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 40px;
+    background: #111;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+  }
 
-/* Janelas futuristas */
-.window {
-  position:absolute; top:100px; left:100px; width:600px; height:400px; background:rgba(30,30,45,0.95);
-  border-radius:15px; box-shadow:0 0 60px rgba(0,255,255,0.5); display:flex; flex-direction:column; transform-style: preserve-3d;
-  transition:transform 0.3s, box-shadow 0.3s;
-}
-.window:hover {box-shadow:0 0 80px cyan; transform:translateZ(20px);}
-.window-header {
-  height:40px; background:rgba(50,50,70,0.95); display:flex; align-items:center;
-  justify-content:space-between; padding:0 10px; cursor:grab;
-}
-.window-title {font-weight:bold; color:#00ffff;}
-.window-controls {display:flex; gap:5px;}
-.window-controls div {
-  width:20px; height:20px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
-  font-weight:bold; font-size:14px; color:black; transition:0.2s;
-}
-.close {background:#ff5f56;} .minimize {background:#ffbd2e;} .maximize {background:#27c93f;}
-.window-content {flex:1; background:rgba(15,15,25,0.95); padding:10px; overflow:auto;}
+  /* Ícones da área de trabalho */
+  .icon {
+    width: 80px; height: 80px;
+    margin: 10px;
+    text-align: center;
+    cursor: pointer;
+    color: #0f0;
+    font-weight: bold;
+    text-shadow: 0 0 8px #0f0;
+  }
+  .icon img { width: 48px; height: 48px; display: block; margin: 0 auto 5px; }
 
-/* Barra de tarefas inferior */
-#taskbar {
-  position:absolute; bottom:0; left:0; width:100%; height:50px; background:rgba(20,20,30,0.9);
-  display:flex; justify-content:space-between; align-items:center; padding:0 10px; border-top:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px);
-}
-#taskbar-left,#taskbar-center,#taskbar-right {display:flex; align-items:center; gap:10px;}
-.task-icon {width:35px; height:35px; display:flex; align-items:center; justify-content:center;
- background:rgba(255,255,255,0.1); border-radius:8px; cursor:pointer; transition:0.2s;}
-.task-icon:hover {background:rgba(255,255,255,0.25);}
+  /* Barras de tarefas */
+  #taskbar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 40px;
+    background: rgba(20,20,20,0.95);
+    border-top: 1px solid #0f0;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+  }
 
-/* Menu Start lateral */
-#start-menu {
-  position:absolute; bottom:50px; left:10px; width:260px; height:400px; background:rgba(20,20,40,0.95);
-  border-radius:15px; display:none; flex-direction:column; padding:10px; box-shadow:0 0 40px cyan;
-}
+  /* Ícones da barra de tarefas */
+  .taskbar-icons {
+    display: flex; align-items: center;
+  }
+  .taskbar-icons .task-icon {
+    width: 36px; height: 36px;
+    margin: 0 4px;
+    cursor: pointer;
+  }
+  .taskbar-right {
+    display: flex; align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
 
-/* Widgets */
-#widgets {position:absolute; top:10px; right:10px; display:flex; gap:10px;}
-.widget {background:rgba(20,20,40,0.8); padding:10px; border-radius:10px; box-shadow:0 0 25px cyan; text-align:center;}
+  /* Menu Start lateral */
+  #startMenu {
+    position: absolute;
+    bottom: 40px; left: 0;
+    width: 250px;
+    height: 400px;
+    background: rgba(10,10,10,0.95);
+    border: 1px solid #0f0;
+    display: none;
+    flex-direction: column;
+    padding: 10px;
+    box-shadow: 0 0 20px #0f0;
+  }
+  .start-item { margin: 10px 0; cursor: pointer; color: #0f0; font-weight: bold; }
+
+  /* Janelas */
+  .window {
+    position: absolute;
+    width: 400px; height: 300px;
+    background: rgba(25,25,25,0.95);
+    border: 2px solid #0f0;
+    box-shadow: 0 0 20px #0f0;
+    display: none;
+    flex-direction: column;
+    animation: fadeIn 0.3s;
+  }
+  .window-header {
+    background: #111;
+    padding: 5px 10px;
+    display: flex; justify-content: space-between;
+    cursor: grab;
+    color: #0f0;
+    font-weight: bold;
+    text-shadow: 0 0 5px #0f0;
+  }
+  .window-content {
+    flex: 1;
+    background: #222;
+    overflow: auto;
+    padding: 10px;
+    color: #fff;
+  }
+  .close-btn { cursor: pointer; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* Neon PS5 estilo */
+  .neon {
+    text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0;
+  }
+
+  /* Navegador */
+  #browser {
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  /* Widgets de tempo */
+  #widget {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: rgba(0,0,0,0.5);
+    padding: 10px;
+    border-radius: 10px;
+    color: #0f0;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 0 10px #0f0;
+  }
+
 </style>
 </head>
 <body>
+
 <div id="desktop">
-  <!-- Desktop Icons -->
-  <div class="desktop-icon" id="icon-my-computer" style="top:20px; left:20px;">
-    <img src="https://cdn-icons-png.flaticon.com/512/32/32441.png" alt="Meu Computador"><div>Meu Computador</div>
-  </div>
-  <div class="desktop-icon" id="icon-documents" style="top:20px; left:100px;">
-    <img src="https://cdn-icons-png.flaticon.com/512/136/136524.png"><div>Documentos</div>
-  </div>
-  <div class="desktop-icon" id="icon-downloads" style="top:20px; left:180px;">
-    <img src="https://cdn-icons-png.flaticon.com/512/724/724933.png"><div>Downloads</div>
-  </div>
-  <div class="desktop-icon" id="icon-browser" style="top:120px; left:20px;">
-    <img src="https://cdn-icons-png.flaticon.com/512/888/888853.png"><div>Navegador</div>
-  </div>
-  <div class="desktop-icon" id="icon-elisa" style="top:120px; left:100px;">
-    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712583.png"><div>Elisa</div>
-  </div>
+  <div class="icon" id="elisaIcon"><img src="https://img.icons8.com/ios-filled/50/00FF00/ai.png"/>Elisa</div>
+  <div class="icon" id="browserIcon"><img src="https://img.icons8.com/ios-filled/50/00FF00/internet.png"/>Browser</div>
+  <div class="icon" id="docsIcon"><img src="https://img.icons8.com/ios-filled/50/00FF00/document.png"/>Meus Documentos</div>
+  <div class="icon" id="downloadsIcon"><img src="https://img.icons8.com/ios-filled/50/00FF00/download.png"/>Downloads</div>
+  <div class="icon" id="computerIcon"><img src="https://img.icons8.com/ios-filled/50/00FF00/computer.png"/>Meu Computador</div>
+</div>
 
-  <!-- Windows -->
-  <div class="window" id="window-browser" style="display:none;">
-    <div class="window-header">
-      <div class="window-title">Navegador</div>
-      <div class="window-controls">
-        <div class="minimize">-</div>
-        <div class="maximize">□</div>
-        <div class="close">×</div>
-      </div>
-    </div>
-    <iframe id="browser" src="https://www.google.com" style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
-  </div>
+<div id="startMenu">
+  <div class="start-item" id="elisaStart">Elisa AI</div>
+  <div class="start-item" id="browserStart">Browser</div>
+  <div class="start-item" id="docsStart">Meus Documentos</div>
+  <div class="start-item" id="downloadsStart">Downloads</div>
+  <div class="start-item" id="computerStart">Meu Computador</div>
+</div>
 
-  <div class="window" id="window-elisa" style="display:none;">
-    <div class="window-header">
-      <div class="window-title">Elisa AI</div>
-      <div class="window-controls">
-        <div class="minimize">-</div>
-        <div class="maximize">□</div>
-        <div class="close">×</div>
-      </div>
-    </div>
-    <div class="window-content">
-      <p>Olá! Pergunte algo à Elisa:</p>
-      <input type="text" id="elisa-input" placeholder="Digite aqui..." style="width:95%; padding:5px;">
-      <button id="elisa-send">Enviar</button>
-      <div id="elisa-response"></div>
-    </div>
+<div id="taskbar">
+  <div class="taskbar-icons">
+    <div id="startBtn"><img src="https://img.icons8.com/ios-filled/30/00FF00/windows.png"/></div>
   </div>
-
-  <!-- Barra de tarefas -->
-  <div id="taskbar">
-    <div id="taskbar-left">
-      <div class="task-icon" id="btn-start">☰</div>
-    </div>
-    <div id="taskbar-center"></div>
-    <div id="taskbar-right">
-      <div class="task-icon" id="widget-clock">00:00</div>
-      <div class="task-icon" id="widget-date">--/--/----</div>
-      <div class="task-icon" id="widget-network">🌐</div>
-      <div class="task-icon" id="widget-volume">🔊</div>
-    </div>
-  </div>
-
-  <!-- Menu Start -->
-  <div id="start-menu">
-    <div class="desktop-icon" id="start-browser">
-      <img src="https://cdn-icons-png.flaticon.com/512/888/888853.png"><div>Navegador</div>
-    </div>
-    <div class="desktop-icon" id="start-elisa">
-      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712583.png"><div>Elisa AI</div>
-    </div>
-  </div>
-
-  <!-- Widgets -->
-  <div id="widgets">
-    <div class="widget" id="widget-climate">☀️ 25°C</div>
+  <div class="taskbar-right">
+    <span id="clock">00:00:00</span>
+    <span id="date">00/00/0000</span>
+    <img src="https://img.icons8.com/ios-filled/24/00FF00/wifi.png"/>
+    <img src="https://img.icons8.com/ios-filled/24/00FF00/high-volume.png"/>
   </div>
 </div>
 
+<div id="widget">Carregando clima...</div>
+
+<!-- Janelas -->
+<div class="window" id="elisaWindow">
+  <div class="window-header"><span>Elisa AI</span><span class="close-btn" data-window="elisaWindow">X</span></div>
+  <div class="window-content">
+    <div id="elisaChat">
+      <p>Olá! Eu sou Elisa. Pergunte qualquer coisa.</p>
+    </div>
+    <input type="text" id="elisaInput" placeholder="Digite aqui..." style="width: 100%; padding:5px; margin-top:10px;"/>
+  </div>
+</div>
+
+<div class="window" id="browserWindow">
+  <div class="window-header"><span>Navegador</span><span class="close-btn" data-window="browserWindow">X</span></div>
+  <iframe id="browser" src="https://www.google.com"></iframe>
+</div>
+
+<div class="window" id="docsWindow">
+  <div class="window-header"><span>Meus Documentos</span><span class="close-btn" data-window="docsWindow">X</span></div>
+  <div class="window-content">Pasta vazia por enquanto...</div>
+</div>
+
+<div class="window" id="downloadsWindow">
+  <div class="window-header"><span>Downloads</span><span class="close-btn" data-window="downloadsWindow">X</span></div>
+  <div class="window-content">Downloads vazios...</div>
+</div>
+
+<div class="window" id="computerWindow">
+  <div class="window-header"><span>Meu Computador</span><span class="close-btn" data-window="computerWindow">X</span></div>
+  <div class="window-content">Explorador do computador (simulado)</div>
+</div>
+
 <script>
-// Drag windows
-function makeDraggable(win){
-  const header = win.querySelector('.window-header');
-  let isDragging=false, offsetX, offsetY;
-  header.addEventListener('mousedown', e=>{
-    isDragging=true;
-    offsetX=e.clientX - win.offsetLeft;
-    offsetY=e.clientY - win.offsetTop;
-    win.style.transition='none';
+  // Data e Hora
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').innerText = `${h}:${m}:${s}`;
+    const d = String(now.getDate()).padStart(2,'0');
+    const mo = String(now.getMonth()+1).padStart(2,'0');
+    const y = now.getFullYear();
+    document.getElementById('date').innerText = `${d}/${mo}/${y}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Menu Start
+  const startBtn = document.getElementById('startBtn');
+  const startMenu = document.getElementById('startMenu');
+  startBtn.addEventListener('click', ()=> { startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex'; });
+
+  // Abrir janelas a partir de ícones ou start menu
+  const windowsMap = {
+    elisaIcon: 'elisaWindow',
+    elisaStart: 'elisaWindow',
+    browserIcon: 'browserWindow',
+    browserStart: 'browserWindow',
+    docsIcon: 'docsWindow',
+    docsStart: 'docsWindow',
+    downloadsIcon: 'downloadsWindow',
+    downloadsStart: 'downloadsWindow',
+    computerIcon: 'computerWindow',
+    computerStart: 'computerWindow'
+  };
+
+  Object.keys(windowsMap).forEach(id => {
+    document.getElementById(id).addEventListener('click', ()=> {
+      const win = document.getElementById(windowsMap[id]);
+      win.style.display = 'flex';
+      win.style.top = '50px';
+      win.style.left = '50px';
+    });
   });
-  document.addEventListener('mouseup', ()=>{isDragging=false; win.style.transition='transform 0.2s';});
+
+  // Fechar janelas
+  document.querySelectorAll('.close-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> {
+      const win = document.getElementById(btn.dataset.window);
+      win.style.display = 'none';
+    });
+  });
+
+  // Arrastar janelas
+  let dragObj = null;
+  let offsetX = 0, offsetY = 0;
+  document.querySelectorAll('.window-header').forEach(header=>{
+    header.addEventListener('mousedown', e=>{
+      dragObj = header.parentElement;
+      offsetX = e.clientX - dragObj.offsetLeft;
+      offsetY = e.clientY - dragObj.offsetTop;
+    });
+  });
   document.addEventListener('mousemove', e=>{
-    if(isDragging){
-      win.style.left=(e.clientX-offsetX)+'px';
-      win.style.top=(e.clientY-offsetY)+'px';
+    if(dragObj){
+      dragObj.style.left = (e.clientX - offsetX) + 'px';
+      dragObj.style.top = (e.clientY - offsetY) + 'px';
     }
   });
-}
-document.querySelectorAll('.window').forEach(w=>makeDraggable(w));
+  document.addEventListener('mouseup', e=>{ dragObj = null; });
 
-// Close windows
-document.querySelectorAll('.window .close').forEach(btn=>{
-  btn.addEventListener('click',()=>{btn.closest('.window').style.display='none';});
-});
+  // Elisa IA Simples (placeholder para API)
+  const elisaChat = document.getElementById('elisaChat');
+  const elisaInput = document.getElementById('elisaInput');
+  elisaInput.addEventListener('keypress', async e=>{
+    if(e.key === 'Enter'){
+      const userText = elisaInput.value;
+      elisaChat.innerHTML += `<p>Você: ${userText}</p>`;
+      elisaInput.value = '';
+      // Chamaria API real da OpenAI aqui, placeholder:
+      const response = "Elisa responde: ainda sem API configurada.";
+      elisaChat.innerHTML += `<p class="neon">${response}</p>`;
+      elisaChat.scrollTop = elisaChat.scrollHeight;
+    }
+  });
 
-// Start menu
-const btnStart=document.getElementById('btn-start');
-const startMenu=document.getElementById('start-menu');
-btnStart.addEventListener('click', ()=>{
-  startMenu.style.display=startMenu.style.display==='flex'?'none':'flex';
-  startMenu.style.flexDirection='column';
-});
-
-// Desktop icons
-document.getElementById('icon-browser').addEventListener('click', ()=>document.getElementById('window-browser').style.display='flex');
-document.getElementById('start-browser').addEventListener('click', ()=>document.getElementById('window-browser').style.display='flex');
-document.getElementById('icon-elisa').addEventListener('click', ()=>document.getElementById('window-elisa').style.display='flex');
-document.getElementById('start-elisa').addEventListener('click', ()=>document.getElementById('window-elisa').style.display='flex');
-
-// Clock and Date
-function updateClock(){
-  const now=new Date();
-  document.getElementById('widget-clock').innerText=now.toLocaleTimeString();
-  document.getElementById('widget-date').innerText=now.toLocaleDateString();
-}
-setInterval(updateClock,1000);
-
-// Elisa API integration (simulação inicial)
-document.getElementById('elisa-send').addEventListener('click', async ()=>{
-  const question=document.getElementById('elisa-input').value;
-  const responseElisa=document.getElementById('elisa-response');
-  responseElisa.innerText='Elisa está processando...';
-  
-  // Simulação de API real (substituir URL pela real)
-  try{
-    const res=await fetch(`https://api.openai.com/v1/chat/completions`,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer SEU_TOKEN_AQUI'
-      },
-      body:JSON.stringify({
-        model:"gpt-3.5-turbo",
-        messages:[{role:"user", content:question}]
-      })
-    });
-    const data=await res.json();
-    responseElisa.innerText=data.choices[0].message.content;
-  }catch(e){responseElisa.innerText='Erro ao conectar com a Elisa API.';}
-  document.getElementById('elisa-input').value='';
-});
+  // Widget clima simples
+  async function updateWeather(){
+    // Placeholder simples
+    document.getElementById('widget').innerText = "25°C, Ensolarado - São Paulo";
+  }
+  updateWeather();
 </script>
+
 </body>
 </html>
