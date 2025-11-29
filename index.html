@@ -1,807 +1,145 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Elisa OS — PS5 Edition (Windows 11 style)</title>
-<style>
-  /* Reset */
-  * { box-sizing: border-box; margin:0; padding:0; font-family: "Segoe UI", Roboto, Arial, sans-serif; }
-  html,body { height:100%; width:100%; overflow:hidden; background:#000; }
+// scripts/desktop.js
 
-  /* PS5 wallpaper (online) */
-  body {
-    background-image: url('https://images.unsplash.com/photo-1603785138328-7a2f8f8f3f8a?auto=format&fit=crop&w=1920&q=80');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    color:#fff;
-  }
+const windowsContainer = document.getElementById('windows-container');
+let openApps = {};
+let maxOpenApps = 10; // Limite inicial de apps abertos
 
-  /* soft overlay to emulate PS5 glow */
-  #background-overlay {
-    position: fixed; inset:0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 100%);
-    pointer-events:none;
-    z-index:0;
-  }
-
-  /* Desktop container */
-  #desktop {
-    position: absolute; inset:0; z-index:1; 
-    user-select:none;
-  }
-
-  /* Desktop icons */
-  .desktop-icon {
-    position: absolute;
-    width: 84px;
-    text-align:center;
-    color: #fff;
-    cursor: grab;
-    padding:6px;
-    transition: transform .12s;
-  }
-  .desktop-icon img { display:block; margin:0 auto; width:56px; height:56px; border-radius:8px; }
-  .desktop-icon .label { margin-top:6px; font-size:13px; text-shadow: 0 1px 2px rgba(0,0,0,.7); }
-
-  .desktop-icon:active { cursor:grabbing; transform:scale(.99); }
-
-  /* Window styles */
-  .win {
-    position:absolute;
-    width:760px; height:480px;
-    background:linear-gradient(#0f1115, #0b0d10);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:10px;
-    box-shadow: 0 8px 30px rgba(0,0,0,.7);
-    display:flex; flex-direction:column;
-    overflow:hidden;
-    z-index:50;
-  }
-
-  .win.hidden { display:none; }
-
-  .win-header {
-    height:42px;
-    display:flex; align-items:center; gap:8px;
-    padding:6px 10px;
-    background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    cursor:grab;
-  }
-  .win-title { flex:1; font-weight:600; color:#fff; font-size:14px; padding-left:6px; }
-  .win-controls button {
-    width:36px; height:28px; margin-left:6px; border-radius:6px;
-    border:none; background:transparent; color:#fff; cursor:pointer;
-  }
-  .win-body { flex:1; padding:8px; background:rgba(0,0,0,0.55); overflow:auto; }
-
-  /* Taskbar */
-  #taskbar {
-    position:fixed; left:0; right:0; bottom:0; height:54px;
-    background:rgba(6,8,12,0.6); backdrop-filter: blur(6px);
-    display:flex; align-items:center; justify-content:space-between;
-    padding:6px 12px; gap:10px; z-index:200;
-    border-top:1px solid rgba(255,255,255,0.03);
-  }
-  #taskbar-left { display:flex; align-items:center; gap:8px; }
-  #taskbar-center { display:flex; align-items:center; gap:6px; flex:1; justify-content:center; }
-  #taskbar-right { display:flex; align-items:center; gap:8px; }
-
-  #start-btn {
-    width:44px; height:44px; border-radius:9px; border:none; background:linear-gradient(180deg,#0f1220,#07101a);
-    color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 4px 10px rgba(0,0,0,.5);
-  }
-
-  .task-btn {
-    min-width:64px; height:36px; background:rgba(255,255,255,0.03); border-radius:8px; display:flex; align-items:center; justify-content:center;
-    color:#fff; padding:0 8px; cursor:pointer; border:none;
-  }
-
-  #clock { color:#fff; font-weight:600; margin-left:6px; }
-
-  /* Start Menu */
-  #start-menu {
-    position:fixed; bottom:64px; left:12px; width:320px; max-height:60vh; overflow:auto;
-    background:linear-gradient(180deg, rgba(10,12,16,0.98), rgba(4,6,8,0.96));
-    border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.6); padding:12px; z-index:400;
-    display:none;
-  }
-  .start-section { margin-bottom:10px; }
-  .start-item { padding:8px; border-radius:6px; color:#fff; cursor:pointer; display:flex; gap:8px; align-items:center; }
-  .start-item:hover { background: rgba(255,255,255,0.03); }
-
-  /* Drop hint */
-  #taskbar-drop-hint {
-    position: absolute; left:0; right:0; bottom:54px; height:10px; pointer-events:none; z-index:300;
-  }
-
-  /* small responsive */
-  @media (max-width:900px){
-    .win { width:92%; height:68%; left:4%; top:8%; }
-    #start-menu { width:86%; left:7%; }
-  }
-
-  /* small helper styles inside window (file lists etc) */
-  .file-list { list-style:none; padding:6px; }
-  .file-list li { padding:6px 8px; border-radius:6px; margin-bottom:6px; background:rgba(255,255,255,0.02); }
-
-  /* icon subtle glow */
-  .desktop-icon .label, .desktop-icon img { transition: box-shadow .15s, transform .12s; }
-  .desktop-icon:hover img { transform:translateY(-3px); box-shadow:0 8px 30px rgba(0,0,0,.6); }
-</style>
-</head>
-<body>
-
-<div id="background-overlay"></div>
-
-<div id="desktop" aria-label="Desktop">
-
-  <!-- Desktop icons (positions can be moved) -->
-  <div class="desktop-icon" id="icon-mycomputer" style="left:18px; top:20px;">
-    <img src="https://img.icons8.com/fluency/96/windows-10.png" alt="Meu PC">
-    <div class="label">Meu PC</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-downloads" style="left:18px; top:120px;">
-    <img src="https://img.icons8.com/fluency/96/downloads.png" alt="Downloads">
-    <div class="label">Downloads</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-docs" style="left:18px; top:220px;">
-    <img src="https://img.icons8.com/fluency/96/document.png" alt="Meus Documentos">
-    <div class="label">Meus Documentos</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-images" style="left:18px; top:320px;">
-    <img src="https://img.icons8.com/fluency/96/image.png" alt="Imagens">
-    <div class="label">Imagens</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-music" style="left:18px; top:420px;">
-    <img src="https://img.icons8.com/fluency/96/musical-notes.png" alt="Música">
-    <div class="label">Música</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-office" style="left:120px; top:20px;">
-    <img src="https://img.icons8.com/fluency/96/microsoft-office-2019.png" alt="Office">
-    <div class="label">Office</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-browser" style="left:120px; top:120px;">
-    <img src="https://img.icons8.com/fluency/96/internet--v1.png" alt="Navegador">
-    <div class="label">Navegador</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-pdf" style="left:120px; top:220px;">
-    <img src="https://img.icons8.com/fluency/96/pdf.png" alt="PDF">
-    <div class="label">PDF</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-notes" style="left:120px; top:320px;">
-    <img src="https://img.icons8.com/fluency/96/notepad.png" alt="Bloco de Notas">
-    <div class="label">Notas</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-n64" style="left:220px; top:20px;">
-    <img src="https://img.icons8.com/fluency/96/game-console.png" alt="N64">
-    <div class="label">N64 (Emulador)</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-snes" style="left:220px; top:120px;">
-    <img src="https://img.icons8.com/fluency/96/game-console.png" alt="SNES">
-    <div class="label">SNES (Emulador)</div>
-  </div>
-
-  <div class="desktop-icon" id="icon-recycle" style="left:220px; top:220px;">
-    <img src="https://img.icons8.com/fluency/96/recycle-bin.png" alt="Lixeira">
-    <div class="label">Lixeira</div>
-  </div>
-
-  <!-- Windows / Apps -->
-  <!-- Meu PC window -->
-  <div class="win hidden" id="win-mycomputer" style="left:100px; top:80px;">
-    <div class="win-header">
-      <div class="win-title">Meu PC</div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body">
-      <h3>Estrutura simulada</h3>
-      <p>Unidade: <strong>C2:\Users\Noel\</strong></p>
-      <ul class="file-list">
-        <li>Desktop</li>
-        <li>Downloads</li>
-        <li>Meus Documentos</li>
-        <li>Imagens</li>
-        <li>Música</li>
-        <li>Lixeira</li>
-      </ul>
-      <p>Use os botões no desktop, ou o menu Start (Elisa) para abrir apps.</p>
-    </div>
-  </div>
-
-  <!-- Downloads window (list files user has opened via input) -->
-  <div class="win hidden" id="win-downloads" style="left:140px; top:100px;">
-    <div class="win-header">
-      <div class="win-title">Downloads (C2:\Users\Noel\Downloads)</div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body">
-      <p>Selecione arquivos para simular os itens em Downloads (ROMs, músicas, imagens, PDFs).</p>
-      <input type="file" id="input-downloads" multiple />
-      <ul id="downloads-list" class="file-list"></ul>
-    </div>
-  </div>
-
-  <!-- Office online window -->
-  <div class="win hidden" id="win-office" style="left:160px; top:120px; width:920px; height:600px;">
-    <div class="win-header">
-      <div class="win-title">Office Online</div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body">
-      <iframe id="iframe-office" src="https://www.office.com/" title="Office Online"></iframe>
-    </div>
-  </div>
-
-  <!-- Browser window -->
-  <div class="win hidden" id="win-browser" style="left:180px; top:140px; width:920px; height:600px;">
-    <div class="win-header">
-      <div class="win-title">Navegador</div>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <input id="browser-url" style="width:420px; padding:6px; border-radius:6px; border:1px solid rgba(255,255,255,.06); background:transparent; color:#fff;" placeholder="Digite URL (https://...)" />
-        <button id="open-url" class="task-btn">Abrir</button>
-        <button id="open-newtab" class="task-btn">Abrir em nova aba</button>
-      </div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body">
-      <iframe id="iframe-browser" src="https://www.google.com" title="Navegador"></iframe>
-    </div>
-  </div>
-
-  <!-- PDF window -->
-  <div class="win hidden" id="win-pdf" style="left:200px; top:160px; width:800px; height:520px;">
-    <div class="win-header">
-      <div class="win-title">PDF Viewer</div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body">
-      <input type="file" id="input-pdf" accept="application/pdf" />
-      <div style="height:100%; margin-top:8px;">
-        <iframe id="iframe-pdf" style="width:100%; height:100%; border:none;"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <!-- Image editor window -->
-  <div class="win hidden" id="win-images" style="left:220px; top:180px; width:880px; height:560px;">
-    <div class="win-header">
-      <div class="win-title">Editor de Imagens</div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body">
-      <input type="file" id="input-image" accept="image/*" />
-      <div id="image-canvas" style="margin-top:8px; display:flex; align-items:center; justify-content:center; height:100%; background:rgba(255,255,255,0.02); border-radius:8px;">
-        <img id="loaded-image" src="" alt="" style="max-width:100%; max-height:100%; display:none; border-radius:6px;" />
-        <div id="image-empty" style="color:#bbb">Nenhuma imagem carregada</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Music player window -->
-  <div class="win hidden" id="win-music" style="left:240px; top:200px; width:640px; height:320px;">
-    <div class="win-header">
-      <div class="win-title">Player de Música</div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body" style="display:flex; flex-direction:column; gap:8px;">
-      <input type="file" id="input-music" accept="audio/*" />
-      <div id="player-controls" style="display:flex; gap:8px; align-items:center;">
-        <button id="play-btn" class="task-btn">Play</button>
-        <button id="pause-btn" class="task-btn">Pause</button>
-        <span id="track-name" style="flex:1; font-weight:600;"></span>
-        <input type="range" id="seek" min="0" max="100" value="0" style="width:180px;">
-      </div>
-      <audio id="audio-player" controls style="width:100%; display:none;"></audio>
-    </div>
-  </div>
-
-  <!-- Emulators -->
-  <div class="win hidden" id="win-n64" style="left:260px; top:220px; width:720px; height:440px;">
-    <div class="win-header">
-      <div class="win-title">Emulador — Nintendo 64 (simulado)</div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body">
-      <p>Carregar ROM / RAM (selecione no diálogo de arquivos)</p>
-      <input type="file" id="n64-file" accept=".z64,.v64,.n64,.bin,.sav" />
-      <div id="n64-info"></div>
-      <p style="margin-top:8px; color:#bbb">Observação: este emulador é a interface que permite selecionar ROMs/RAM do seu computador (Downloads). Para rodar emuladores reais, hospede o emulador (RetroArch ou similar) e a ROM em repositório compatível.</p>
-    </div>
-  </div>
-
-  <div class="win hidden" id="win-snes" style="left:280px; top:240px; width:720px; height:440px;">
-    <div class="win-header">
-      <div class="win-title">Emulador — Super Nintendo (simulado)</div>
-      <div class="win-controls">
-        <button class="min">─</button>
-        <button class="max">▣</button>
-        <button class="close">✕</button>
-      </div>
-    </div>
-    <div class="win-body">
-      <p>Carregar ROM / Save (selecione no diálogo de arquivos)</p>
-      <input type="file" id="snes-file" accept=".smc,.sfc,.fig,.bin,.sav" />
-      <div id="snes-info"></div>
-    </div>
-  </div>
-
-</div>
-
-<!-- Taskbar -->
-<div id="taskbar" role="toolbar" aria-label="barra de tarefas">
-  <div id="taskbar-left">
-    <button id="start-btn" title="Start / Elisa" aria-haspopup="true">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4 4h7v7H4zM13 4h7v7h-7zM13 13h7v7h-7zM4 13h7v7H4z"/></svg>
-    </button>
-    <div id="taskbar-center"></div>
-  </div>
-  <div id="taskbar-right">
-    <input type="range" id="global-volume" min="0" max="100" value="60" title="Volume" />
-    <div id="clock" aria-live="polite" style="font-weight:600;"></div>
-  </div>
-</div>
-
-<!-- Start menu -->
-<div id="start-menu" role="menu" aria-hidden="true">
-  <div class="start-section">
-    <div class="start-item" data-open="win-office">Office Online</div>
-    <div class="start-item" data-open="win-browser">Navegador</div>
-    <div class="start-item" data-open="win-notes">Bloco de Notas</div>
-    <div class="start-item" data-open="win-pdf">PDF Viewer</div>
-  </div>
-  <div class="start-section">
-    <div class="start-item" data-open="win-n64">Emulador N64</div>
-    <div class="start-item" data-open="win-snes">Emulador SNES</div>
-    <div class="start-item" data-open="win-music">Player de Música</div>
-  </div>
-  <div class="start-section">
-    <div class="start-item" data-open="win-mycomputer">Meu PC</div>
-    <div class="start-item" data-open="win-downloads">Downloads</div>
-    <div class="start-item" data-open="win-images">Editor de Imagens</div>
-    <div class="start-item" id="start-shutdown">Desligar / Sair</div>
-  </div>
-</div>
-
-<script>
-/* ===== Configuration & helpers ===== */
-const STATE = {
-  zIndexCounter: 100,
-  singleUserBase: "C2:\\Users\\Noel\\",
-  downloadsFiles: []
-};
-
-function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
-
-/* ===== Utility: make element draggable by handle ===== */
-function makeDraggable(winEl, handleEl){
-  let dragging=false, startX=0, startY=0, startLeft=0, startTop=0;
-  handleEl.addEventListener('mousedown', (e)=>{
-    dragging=true;
-    startX = e.clientX;
-    startY = e.clientY;
-    startLeft = parseInt(getComputedStyle(winEl).left || 100,10);
-    startTop = parseInt(getComputedStyle(winEl).top || 80,10);
-    winEl.style.zIndex = ++STATE.zIndexCounter;
-    document.body.style.userSelect = "none";
-  });
-  window.addEventListener('mousemove', (e)=>{
-    if(!dragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    winEl.style.left = (startLeft + dx) + 'px';
-    winEl.style.top = (startTop + dy) + 'px';
-  });
-  window.addEventListener('mouseup', ()=>{
-    dragging=false;
-    document.body.style.userSelect = "";
-  });
-}
-
-/* ===== Open / Show windows ===== */
-function showWindow(id, bringToFront=true){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.classList.remove('hidden');
-  if(bringToFront) el.style.zIndex = ++STATE.zIndexCounter;
-  addTaskButtonForWindow(id);
-}
-
-/* ===== Close / hide windows ===== */
-function hideWindow(id){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.classList.add('hidden');
-  removeTaskButtonForWindow(id);
-}
-
-/* ===== Minimize (hide but keep task btn) ===== */
-function minimizeWindow(id){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.classList.add('hidden');
-  // keep task button
-}
-
-/* ===== Maximize / restore ===== */
-function toggleMaxWindow(winEl){
-  if(!winEl.dataset.restored){
-    // save
-    winEl.dataset.prevLeft = winEl.style.left || '100px';
-    winEl.dataset.prevTop = winEl.style.top || '80px';
-    winEl.dataset.prevWidth = winEl.style.width || winEl.offsetWidth+'px';
-    winEl.dataset.prevHeight = winEl.style.height || winEl.offsetHeight+'px';
-    // maximize
-    winEl.style.left = '8px';
-    winEl.style.top = '8px';
-    winEl.style.width = (window.innerWidth - 16) + 'px';
-    winEl.style.height = (window.innerHeight - 80) + 'px';
-    winEl.dataset.restored = 'no';
+// Login
+function login() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  if(username && password){
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('desktop').classList.remove('hidden');
+    preloadApps();
   } else {
-    // restore
-    winEl.style.left = winEl.dataset.prevLeft;
-    winEl.style.top = winEl.dataset.prevTop;
-    winEl.style.width = winEl.dataset.prevWidth;
-    winEl.style.height = winEl.dataset.prevHeight;
-    delete winEl.dataset.restored;
+    alert('Digite usuário e senha.');
   }
-  winEl.style.zIndex = ++STATE.zIndexCounter;
 }
 
-/* ===== Taskbar button management ===== */
-function addTaskButtonForWindow(winId){
-  if(document.getElementById('taskbtn-'+winId)) return;
-  const btn = document.createElement('button');
-  btn.className = 'task-btn';
-  btn.id = 'taskbtn-'+winId;
-  btn.textContent = document.querySelector('#'+winId+' .win-title').textContent;
-  btn.addEventListener('click', ()=>{
-    const win = document.getElementById(winId);
-    if(!win) return;
-    if(win.classList.contains('hidden')){
-      showWindow(winId);
-    } else {
-      // if visible, minimize
-      minimizeWindow(winId);
+// Pré-carregamento turbo de apps
+function preloadApps() {
+  const apps = ['office','chatgpt','teams','whatsapp','spotify','youtube','netflix','prime','games','files'];
+  apps.forEach(app => openApps[app] = null);
+}
+
+// Abrir app
+function openApp(appName) {
+  if(Object.values(openApps).filter(w => w !== null).length >= maxOpenApps){
+    alert('Sistema em uso alto, feche algumas janelas antes.');
+    return;
+  }
+  if(openApps[appName] !== null){
+    openApps[appName].style.zIndex = getMaxZIndex()+1;
+    return;
+  }
+
+  const win = document.createElement('div');
+  win.classList.add('window');
+  win.innerHTML = `
+    <div class="window-header">
+      <span>${capitalize(appName)}</span>
+      <div class="window-controls">
+        <button onclick="closeApp('${appName}')">X</button>
+      </div>
+    </div>
+    <div class="window-body">
+      <iframe src="apps/${appName}.html" frameborder="0"></iframe>
+    </div>
+  `;
+  win.style.zIndex = getMaxZIndex()+1;
+  windowsContainer.appendChild(win);
+  openApps[appName] = win;
+  makeDraggable(win);
+}
+
+// Fechar app
+function closeApp(appName){
+  if(openApps[appName]){
+    windowsContainer.removeChild(openApps[appName]);
+    openApps[appName] = null;
+  }
+}
+
+// Z-index máximo
+function getMaxZIndex(){
+  const zIndexes = Array.from(windowsContainer.children).map(c => parseInt(window.getComputedStyle(c).zIndex) || 0);
+  return zIndexes.length ? Math.max(...zIndexes) : 0;
+}
+
+// Draggable
+function makeDraggable(el){
+  let pos1=0,pos2=0,pos3=0,pos4=0;
+  const header = el.querySelector('.window-header');
+  if(header) header.onmousedown=dragMouseDown;
+
+  function dragMouseDown(e){
+    e.preventDefault();
+    pos3=e.clientX;
+    pos4=e.clientY;
+    document.onmouseup=closeDragElement;
+    document.onmousemove=elementDrag;
+  }
+  function elementDrag(e){
+    e.preventDefault();
+    pos1=pos3-e.clientX;
+    pos2=pos4-e.clientY;
+    pos3=e.clientX;
+    pos4=e.clientY;
+    el.style.top=(el.offsetTop-pos2)+'px';
+    el.style.left=(el.offsetLeft-pos1)+'px';
+  }
+  function closeDragElement(){
+    document.onmouseup=null;
+    document.onmousemove=null;
+  }
+}
+
+function capitalize(str){ return str.charAt(0).toUpperCase()+str.slice(1); }
+
+// Monitor de memória/processador (simulado)
+setInterval(()=>{
+  const used = Object.values(openApps).filter(w => w!==null).length;
+  if(used>=maxOpenApps) maxOpenApps=used;
+},5000);
+
+/////////////////////////////
+// INTEGRAÇÃO COM CHAT GPT //
+/////////////////////////////
+
+// Recebe comando do Chat GPT
+async function executarComandoElisa(comando){
+  comando = comando.toLowerCase();
+
+  // Abrir apps
+  if(comando.includes('abrir office')) openApp('office');
+  else if(comando.includes('abrir teams')) openApp('teams');
+  else if(comando.includes('abrir spotify')) openApp('spotify');
+  else if(comando.includes('abrir youtube')) openApp('youtube');
+  else if(comando.includes('abrir whatsapp')) openApp('whatsapp');
+  else if(comando.includes('abrir netflix')) openApp('netflix');
+  else if(comando.includes('abrir prime')) openApp('prime');
+  else if(comando.includes('abrir jogos') || comando.includes('abrir games')) openApp('games');
+  else if(comando.includes('abrir arquivos') || comando.includes('abrir pendrive')) openApp('files');
+
+  // Sugerir ações
+  else if(comando.includes('criar documento')) openApp('office');
+  else if(comando.includes('tocar música')) openApp('spotify');
+}
+
+// Conectar chat GPT com a Elisa
+function initChatGPTIntegration(){
+  const chatFrame = document.querySelector('#windows-container iframe[src*="chatgpt"]');
+  if(!chatFrame) return;
+
+  const chatWindow = chatFrame.contentWindow;
+
+  // Receber mensagens do chat GPT
+  window.addEventListener('message', e=>{
+    if(e.data?.type==='elisa-comando'){
+      executarComandoElisa(e.data.comando);
     }
   });
-  document.getElementById('taskbar-center').appendChild(btn);
 }
 
-function removeTaskButtonForWindow(winId){
-  const b = document.getElementById('taskbtn-'+winId);
-  if(b) b.remove();
-}
-
-/* ===== Hook up header controls for all windows ===== */
-document.querySelectorAll('.win').forEach(win=>{
-  const header = win.querySelector('.win-header') || win.querySelector('.win-header');
-  const minBtn = win.querySelector('.win-controls .min');
-  const maxBtn = win.querySelector('.win-controls .max');
-  const closeBtn = win.querySelector('.win-controls .close');
-
-  // draggable
-  if(header) makeDraggable(win, header);
-
-  if(minBtn) minBtn.addEventListener('click', ()=> minimizeWindow(win.id));
-  if(maxBtn) maxBtn.addEventListener('click', ()=> toggleMaxWindow(win));
-  if(closeBtn) closeBtn.addEventListener('click', ()=> hideWindow(win.id));
-
-  // bring to front on mousedown
-  win.addEventListener('mousedown', ()=> win.style.zIndex = ++STATE.zIndexCounter);
-});
-
-/* ===== Desktop icon drag & double click to open ===== */
-document.querySelectorAll('.desktop-icon').forEach(icon=>{
-  let drag=false, offsetX=0, offsetY=0;
-  icon.addEventListener('mousedown', (e)=>{
-    drag=true;
-    offsetX = e.offsetX;
-    offsetY = e.offsetY;
-    icon.style.zIndex = ++STATE.zIndexCounter;
-  });
-  window.addEventListener('mousemove', (e)=>{
-    if(!drag) return;
-    icon.style.left = (e.pageX - offsetX) + 'px';
-    icon.style.top = (e.pageY - offsetY) + 'px';
-  });
-  window.addEventListener('mouseup', (e)=>{
-    if(drag){
-      drag=false;
-      // if dropped over taskbar center => pin to taskbar
-      const tb = document.getElementById('taskbar-center').getBoundingClientRect();
-      const x = e.clientX, y = e.clientY;
-      if(y > tb.top && y < tb.bottom){
-        // simulate move to taskbar: add task button and hide icon
-        const targetWinId = mapIconToWindowId(icon.id);
-        if(targetWinId) {
-          addTaskButtonForWindow(targetWinId);
-          icon.style.opacity = '0.25';
-        }
-      }
-    }
-  });
-  // double click to open
-  icon.addEventListener('dblclick', ()=>{
-    const winId = mapIconToWindowId(icon.id);
-    if(winId) showWindow(winId);
-  });
-});
-
-/* Map desktop icon IDs to window IDs */
-function mapIconToWindowId(iconId){
-  switch(iconId){
-    case 'icon-mycomputer': return 'win-mycomputer';
-    case 'icon-downloads': return 'win-downloads';
-    case 'icon-docs': return 'win-mycomputer';
-    case 'icon-images': return 'win-images';
-    case 'icon-music': return 'win-music';
-    case 'icon-office': return 'win-office';
-    case 'icon-browser': return 'win-browser';
-    case 'icon-pdf': return 'win-pdf';
-    case 'icon-notes': return 'win-notes';
-    case 'icon-n64': return 'win-n64';
-    case 'icon-snes': return 'win-snes';
-    case 'icon-recycle': return 'win-recycle';
-    default: return null;
-  }
-}
-
-/* ===== Start / Elisa menu toggle ===== */
-const startBtn = document.getElementById('start-btn');
-const startMenu = document.getElementById('start-menu');
-startBtn.addEventListener('click', ()=>{
-  const visible = startMenu.style.display === 'block';
-  startMenu.style.display = visible ? 'none' : 'block';
-});
-
-/* open when selecting start items */
-document.querySelectorAll('#start-menu .start-item').forEach(it=>{
-  it.addEventListener('click', ()=>{
-    const w = it.dataset.open;
-    if(w) showWindow(w);
-    if(it.id === 'start-shutdown') { alert('Desligando (simulado).'); }
-    startMenu.style.display = 'none';
-  });
-});
-
-/* close start menu when clicking outside */
-window.addEventListener('click', (e)=>{
-  if(!startMenu.contains(e.target) && !startBtn.contains(e.target)){
-    startMenu.style.display = 'none';
-  }
-});
-
-/* ===== Clock ===== */
-function updateClock(){
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mm = String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('clock').textContent = hh + ':' + mm;
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-/* ===== Browser controls ===== */
-document.getElementById('open-url').addEventListener('click', ()=>{
-  const url = document.getElementById('browser-url').value.trim();
-  if(!url) return alert('Digite uma URL (ex.: https://www.google.com)');
-  const frame = document.getElementById('iframe-browser');
-  frame.src = url.startsWith('http') ? url : 'https://' + url;
-  showWindow('win-browser');
-});
-document.getElementById('open-newtab').addEventListener('click', ()=>{
-  const url = document.getElementById('browser-url').value.trim() || 'https://www.google.com';
-  window.open(url.startsWith('http')?url:'https://'+url,'_blank');
-});
-
-/* ===== Downloads window: maintain list of selected files ===== */
-const downloadsInput = document.getElementById('input-downloads');
-const downloadsList = document.getElementById('downloads-list');
-downloadsInput.addEventListener('change', (e)=>{
-  const files = Array.from(e.target.files);
-  files.forEach(f=>{
-    STATE.downloadsFiles.push(f);
-    const li = document.createElement('li');
-    li.textContent = f.name + ' (' + Math.round(f.size/1024) + ' KB)';
-    downloadsList.appendChild(li);
-  });
-  showWindow('win-downloads');
-});
-
-/* ===== PDF Viewer ===== */
-document.getElementById('input-pdf').addEventListener('change', (e)=>{
-  const f = e.target.files[0];
-  if(!f) return;
-  const url = URL.createObjectURL(f);
-  document.getElementById('iframe-pdf').src = url;
-  showWindow('win-pdf');
-});
-
-/* ===== Image editor ===== */
-const inputImage = document.getElementById('input-image');
-const loadedImage = document.getElementById('loaded-image');
-const imageEmpty = document.getElementById('image-empty');
-inputImage.addEventListener('change', (e)=>{
-  const f = e.target.files[0];
-  if(!f) return;
-  const url = URL.createObjectURL(f);
-  loadedImage.src = url;
-  loadedImage.style.display = 'block';
-  imageEmpty.style.display = 'none';
-  showWindow('win-images');
-});
-
-/* ===== Music Player ===== */
-const audio = document.getElementById('audio-player');
-const inputMusic = document.getElementById('input-music');
-const playBtn = document.getElementById('play-btn');
-const pauseBtn = document.getElementById('pause-btn');
-const trackName = document.getElementById('track-name');
-const seek = document.getElementById('seek');
-inputMusic.addEventListener('change', (e)=>{
-  const f = e.target.files[0];
-  if(!f) return;
-  const url = URL.createObjectURL(f);
-  audio.src = url;
-  audio.style.display = 'block';
-  trackName.textContent = f.name;
-  showWindow('win-music');
-});
-playBtn.addEventListener('click', ()=> audio.play());
-pauseBtn.addEventListener('click', ()=> audio.pause());
-audio.addEventListener('timeupdate', ()=>{
-  if(audio.duration) {
-    seek.value = Math.round((audio.currentTime/audio.duration)*100);
-  }
-});
-seek.addEventListener('input', ()=>{
-  if(audio.duration) audio.currentTime = (seek.value/100) * audio.duration;
-});
-/* Global volume slider controls audio player volume */
-document.getElementById('global-volume').addEventListener('input', (e)=>{
-  const v = e.target.value / 100;
-  audio.volume = v;
-});
-
-/* ===== Emulators (file selectors) ===== */
-document.getElementById('n64-file').addEventListener('change', (e)=>{
-  const f = e.target.files[0];
-  if(!f) return;
-  document.getElementById('n64-info').textContent = 'Arquivo carregado: ' + f.name + ' (' + Math.round(f.size/1024) + ' KB)';
-  showWindow('win-n64');
-});
-document.getElementById('snes-file').addEventListener('change', (e)=>{
-  const f = e.target.files[0];
-  if(!f) return;
-  document.getElementById('snes-info').textContent = 'Arquivo carregado: ' + f.name + ' (' + Math.round(f.size/1024) + ' KB)';
-  showWindow('win-snes');
-});
-
-/* ===== Office iframe: show window when desktop icon double clicked or start menu ===== */
-/* Handled by start menu mapping and desktop dblclick mapping */
-
-/* ===== Ensure windows are not overlapping on open by nudging positions ===== */
-function nudgeWindowPosition(winEl){
-  // keep within viewport
-  const rect = winEl.getBoundingClientRect();
-  let left = rect.left, top = rect.top;
-  left = clamp(left, 8, window.innerWidth - 160);
-  top = clamp(top, 8, window.innerHeight - 120 - 54);
-  winEl.style.left = left + 'px';
-  winEl.style.top = top + 'px';
-  winEl.style.zIndex = ++STATE.zIndexCounter;
-}
-
-/* Attach double click mapping for desktop icons to show corresponding window (already set) 
-   Also create mappings to open windows from start menu items (already set) */
-
-/* Pre-populate: map dblclick to open windows for icons (already implemented earlier) */
-document.querySelectorAll('.desktop-icon').forEach(icon=>{
-  icon.addEventListener('dblclick', ()=>{
-    const winId = mapIconToWindowId(icon.id);
-    if(winId) {
-      showWindow(winId);
-      nudgeWindowPosition(document.getElementById(winId));
-    }
-  });
-});
-
-/* Ensure that when window is shown, taskbar gets a button (done inside showWindow) */
-
-/* ===== Attach minimize/max/close also for windows opened by start menu (already) ===== */
-
-/* ===== Accessibility: keyboard ESC hides start menu ===== */
-window.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape') startMenu.style.display = 'none';
-});
-
-/* ===== On first interaction: optionally play PS5-style start sound (user must click) ===== */
-let playedStartAudio = false;
-function playStartSound(){
-  if(playedStartAudio) return;
-  const a = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-  a.volume = 0.5;
-  a.play().catch(()=>{/* autoplay might be blocked */});
-  playedStartAudio = true;
-}
-['click','touchstart'].forEach(evt => window.addEventListener(evt, playStartSound, {once:true}));
-
-/* ===== Extra: when resizing window, ensure maximized windows adapt ===== */
-window.addEventListener('resize', ()=>{
-  document.querySelectorAll('.win').forEach(w=>{
-    if(w.dataset.restored === 'no'){ // currently maximized
-      w.style.width = (window.innerWidth - 16) + 'px';
-      w.style.height = (window.innerHeight - 80) + 'px';
-    }
-  });
-});
-
-/* ===== Helper: quick open mapping for start menu items (already set) ===== */
-
-/* ===== Make sure clicking on taskbar center (empty) toggles desktop icons opacity (simulate show desktop) ===== */
-document.getElementById('taskbar-center').addEventListener('dblclick', ()=>{
-  // show desktop (minimize all)
-  document.querySelectorAll('.win').forEach(w => {
-    if(!w.classList.contains('hidden')) minimizeWindow(w.id);
-  });
-});
-
-/* ===== Final: small onboarding console message with user's setup details ===== */
-console.log("Elisa OS (PS5 Edition) loaded. Simulated base path:", STATE.singleUserBase);
-console.log("Use the desktop icons or Start menu to open apps. Use file inputs inside apps to load files from your system (Downloads, Desktop, etc.).");
-
-/* ===== Notes for user (displayed once) ===== */
-setTimeout(()=>{
-  if(confirm("Deseja ver instruções rápidas de uso do Elisa OS (simulado)?")){
-    alert("Instruções rápidas:\n- Dê um duplo-clique nos ícones para abrir apps.\n- Use os inputs dentro dos apps (PDF, Música, Emulador) para selecionar arquivos do seu computador (Downloads, Desktop...).\n- Arraste ícones para a barra de tarefas para criar um atalho rápido (arraste de volta para restaurar).\n- Use o Start (Elisa) para abrir apps e configurações.\n- Se algum site não carregar dentro do iframe, use 'Abrir em nova aba'.");
-  }
-},1200);
-
-</script>
-</body>
-</html>
+setInterval(initChatGPTIntegration, 3000);
