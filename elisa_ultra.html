@@ -1,1 +1,706 @@
-p
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ELISA — Painel Único</title>
+<style>
+  /* ===== Reset e tipografia ===== */
+  :root{
+    --bg:#0b1220;
+    --panel:#0f1624;
+    --accent:#2fa1ff;
+    --muted:#9aa6b2;
+    --glass: rgba(255,255,255,0.04);
+    --glass-2: rgba(255,255,255,0.02);
+    --success: #4caf50;
+    --danger: #ff5252;
+    --glass-border: rgba(255,255,255,0.06);
+    --radius:12px;
+    --shadow: 0 6px 18px rgba(2,6,23,0.6);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(47,161,255,0.06), transparent),
+                linear-gradient(180deg, #071021 0%, #05101a 45%, #031017 100%);
+    color:#e6f1fb;
+    font-size:15px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:20px;
+  }
+
+  /* ===== Layout principal ===== */
+  .app{
+    max-width:1200px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns: 300px 1fr 360px;
+    gap:18px;
+    align-items:start;
+  }
+
+  /* Mobile */
+  @media (max-width:980px){
+    .app{grid-template-columns:1fr; padding-bottom:60px}
+    header .right-controls{display:none}
+  }
+
+  header{
+    grid-column:1/-1;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+  }
+  .title{
+    display:flex;gap:12px;align-items:center;
+  }
+  .logo{
+    width:56px;height:56px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent), #6f5bff);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow: 0 6px 24px rgba(47,161,255,0.08);
+    font-weight:700;
+    color:#021025;
+  }
+  h1{font-size:18px;margin:0}
+  p.sub{margin:0;color:var(--muted);font-size:13px}
+
+  .right-controls{display:flex;gap:8px;align-items:center}
+
+  /* ===== Painéis ===== */
+  .panel{
+    background:linear-gradient(180deg,var(--panel), rgba(10,15,22,0.84));
+    border-radius:var(--radius);
+    padding:14px;
+    box-shadow:var(--shadow);
+    border:1px solid var(--glass-border);
+  }
+
+  /* Sidebar */
+  .sidebar .menu{display:flex;flex-direction:column;gap:8px}
+  .menu button{
+    text-align:left;padding:10px;border-radius:10px;border:none;background:transparent;color:inherit;
+    display:flex;gap:10px;align-items:center;font-weight:600;cursor:pointer;
+  }
+  .menu button.active{background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent)}
+  .small{font-size:13px;color:var(--muted);margin-top:8px}
+
+  /* Main central area */
+  .main{min-height:520px; display:flex;flex-direction:column;gap:12px}
+  .row{display:flex;gap:12px}
+  .grow{flex:1}
+
+  textarea.code{
+    width:100%;min-height:260px;background:transparent;border:1px dashed var(--glass-border);
+    color: #dff1ff;padding:12px;border-radius:10px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+    resize:vertical;outline:none;
+  }
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{
+    padding:10px 12px;border-radius:10px;border:none;background:var(--accent);color:#021025;font-weight:700;cursor:pointer;
+  }
+  .btn.ghost{background:transparent;border:1px solid var(--glass-border);color:var(--muted);font-weight:600}
+  .btn.warn{background:var(--danger);color:white}
+  .btn.ok{background:var(--success);color:white}
+
+  /* Right column (chat/logs) */
+  .chat{
+    display:flex;flex-direction:column;height:520px;
+  }
+  .chat-messages{
+    overflow:auto;padding:12px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    flex:1;margin-bottom:8px;border:1px solid var(--glass-border)
+  }
+  .msg{margin:8px 0;padding:10px;border-radius:10px;max-width:86%}
+  .msg.me{background:rgba(47,161,255,0.12);align-self:flex-end;color:#d6f3ff}
+  .msg.elisa{background:rgba(255,255,255,0.02);align-self:flex-start;color:var(--muted)}
+  .chat-input{display:flex;gap:8px}
+  .chat-input input{flex:1;padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:inherit}
+
+  /* small widgets */
+  .widget{padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid var(--glass-border)}
+  .kv{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
+  .muted{color:var(--muted);font-size:13px}
+
+  .file-list{max-height:160px;overflow:auto}
+  .file-item{display:flex;justify-content:space-between;align-items:center;padding:6px;border-radius:8px;margin:6px 0}
+  .file-item button{padding:6px 8px;border-radius:8px;border:none;background:transparent;color:var(--accent);cursor:pointer}
+
+  footer{grid-column:1/-1;margin-top:12px;color:var(--muted);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="title">
+      <div class="logo">EL</div>
+      <div>
+        <h1>ELISA — Painel Único</h1>
+        <p class="sub">PDTA · Memória Dinâmica · Gerenciador · Chat</p>
+      </div>
+    </div>
+    <div class="right-controls">
+      <div class="kv muted">Status: <span id="statusText">Desconectado</span></div>
+      <button class="btn" id="btnStart">Start</button>
+      <button class="btn ghost" id="btnStop">Stop</button>
+      <button class="btn ghost" id="backupBtn">Backup</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="panel sidebar">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>Menu</strong>
+      <small class="muted">v1.0</small>
+    </div>
+    <div class="menu" style="margin-top:12px">
+      <button class="active" data-view="dashboard">Dashboard</button>
+      <button data-view="pdta">Editor PDTA</button>
+      <button data-view="memory">Memória</button>
+      <button data-view="files">Arquivos</button>
+      <button data-view="settings">Configurações</button>
+    </div>
+
+    <div class="small">Atalhos</div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn ghost" id="openLog">Ver Logs</button>
+      <button class="btn ghost" id="clearMemory">Limpar Memória</button>
+    </div>
+
+    <div style="margin-top:14px">
+      <div class="muted">Tema</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn" id="themePS">PS4</button>
+        <button class="btn ghost" id="themeDark">Dark</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="panel main">
+    <!-- DASHBOARD -->
+    <section id="view-dashboard">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Dashboard</h2>
+          <div class="muted">Resumo rápido da ELISA</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="widget">
+            <div class="muted">Memória ativa</div>
+            <div id="memCount">0 entradas</div>
+          </div>
+          <div class="widget">
+            <div class="muted">Arquivos</div>
+            <div id="filesCount">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <div class="widget grow">
+          <strong>PDTA (Resumo)</strong>
+          <div id="pdtaSummary" class="muted" style="margin-top:8px">Nenhum PDTA carregado.</div>
+        </div>
+        <div style="width:320px;display:flex;flex-direction:column;gap:12px">
+          <div class="widget">
+            <div class="muted">Últimas atividades</div>
+            <div id="activities" style="margin-top:8px" class="muted">Sem atividades</div>
+          </div>
+
+          <div class="widget">
+            <div class="muted">Ações rápidas</div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" id="editPDTA">Abrir editor PDTA</button>
+              <button class="btn ghost" id="openMemory">Abrir Memória</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PDTA EDITOR -->
+    <section id="view-pdta" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Editor PDTA</h2>
+          <div class="muted">Edite o fluxo da PDTA aqui</div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="savePdta">Salvar</button>
+          <button class="btn ghost" id="downloadPdta">Exportar (.json)</button>
+          <button class="btn ghost" id="loadExamples">Exemplo</button>
+        </div>
+      </div>
+
+      <textarea id="pdtaEditor" class="code" placeholder='{"name":"PDTA exemplo","steps":[...]}'>
+{
+  "name": "PDTA - Exemplo",
+  "description": "Fluxo exemplo para iniciar",
+  "steps": [
+    {"id":1,"name":"Iniciar","type":"start"},
+    {"id":2,"name":"Coletar dados","type":"action"},
+    {"id":3,"name":"Analisar","type":"action"},
+    {"id":4,"name":"Responder","type":"end"}
+  ]
+}
+      </textarea>
+    </section>
+
+    <!-- MEMORY -->
+    <section id="view-memory" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Memória Dinâmica</h2>
+          <div class="muted">Visualize e edite as entradas</div>
+        </div>
+        <div class="controls">
+          <button class="btn ghost" id="importMemory">Importar</button>
+          <button class="btn" id="exportMemory">Exportar</button>
+          <button class="btn warn" id="clearMemoryBtn">Limpar</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:12px">
+        <div style="flex:1">
+          <div id="memoryList" class="widget file-list">Nenhuma entrada</div>
+        </div>
+        <div style="width:320px">
+          <div class="widget">
+            <div class="muted">Nova entrada</div>
+            <input id="memKey" placeholder="chave" style="width:100%;padding:8px;margin-top:6px;border-radius:8px;background:transparent;border:1px solid var(--glass-border)" />
+            <textarea id="memValue" placeholder='valor (json ou texto)' style="width:100%;margin-top:6px;padding:8px;border-radius:8px;background:transparent;border:1px solid var(--glass-border);min-height:120px"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" id="addMem">Adicionar</button>
+              <button class="btn ghost" id="updateMem">Atualizar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILES -->
+    <section id="view-files" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Arquivos</h2>
+          <div class="muted">Upload / Download / Backup</div>
+        </div>
+        <div class="controls">
+          <input type="file" id="fileUploader" multiple style="display:none" />
+          <button class="btn" id="btnUpload">Upload</button>
+          <button class="btn ghost" id="btnDownloadZip">Download Zip</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="file-list panel" id="fileListArea">
+        <div class="muted">Nenhum arquivo carregado.</div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" style="display:none">
+      <h2>Configurações</h2>
+      <div class="muted">Ajuste as URLs do backend e opções</div>
+      <div style="margin-top:12px;display:flex;gap:12px;flex-direction:column">
+        <label class="muted">API Base</label>
+        <input id="apiBase" placeholder="https://meu-servidor.com" style="padding:8px;border-radius:8px;border:1px solid var(--glass-border);background:transparent" />
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="saveSettings">Salvar</button>
+          <button class="btn ghost" id="resetSettings">Reset</button>
+        </div>
+      </div>
+      <div style="margin-top:12px" class="widget">
+        <div class="muted">Observações</div>
+        <ul style="margin:6px 0;color:var(--muted)">
+          <li>Endpoint de chat padrão: <code>/api/elisa</code> (POST JSON {message:"..."})</li>
+          <li>Start/Stop: <code>/api/start</code>, <code>/api/stop</code> (POST)</li>
+          <li>Backup PDTA: baixe do editor e suba no servidor conforme sua infra</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- RIGHT COLUMN: CHAT E LOGS -->
+  <aside class="panel" style="display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong>Chat — ELISA</strong>
+      <div class="muted">Integração</div>
+    </div>
+
+    <div class="chat">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="chatInput" placeholder="Escreva para a ELISA..." />
+        <button class="btn" id="sendChat">Enviar</button>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="widget" style="margin-top:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Logs</strong><div class="muted">Últimas mensagens do sistema</div></div>
+        <button class="btn ghost" id="clearLogs">Limpar</button>
+      </div>
+      <div id="logArea" style="margin-top:10px;max-height:120px;overflow:auto" class="muted">Sem logs.</div>
+    </div>
+  </aside>
+
+  <footer>
+    ELISA — Painel único • Salve este arquivo e suba no Replit dentro da pasta `static/` ou abra localmente. Desenvolvido por você e com ajuda do ChatGPT.
+  </footer>
+</div>
+
+<script>
+/*
+  ELISA Single HTML UI
+  - Guarda configurações em localStorage
+  - Integra com backend através de API_BASE + endpoints
+  - Manipula PDTA, memória, arquivos e chat
+*/
+
+/* ===== Configurações iniciais ===== */
+const DEFAULT_API_BASE = ''; // se deixar vazio usa caminhos relativos (ex: /api/elisa)
+const API = {
+  base: localStorage.getItem('elisa_api_base') || DEFAULT_API_BASE,
+  endpoints: {
+    elisa: '/api/elisa',
+    start: '/api/start',
+    stop: '/api/stop'
+  }
+};
+
+const qs = sel => document.querySelector(sel);
+const qsa = sel => Array.from(document.querySelectorAll(sel));
+
+/* ===== Helpers ===== */
+function log(msg){
+  const area = qs('#logArea');
+  const now = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.textContent = `[${now}] ${msg}`;
+  area.prepend(line);
+  // keep max 200 lines
+  if(area.children.length > 200) area.removeChild(area.lastChild);
+}
+
+function setStatus(text, color){
+  qs('#statusText').textContent = text;
+  if(color) qs('#statusText').style.color = color;
+}
+
+/* ===== Navigation ===== */
+qsa('.menu button').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    qsa('.menu button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    qsa('main section').forEach(s=> s.style.display = (s.id === 'view-'+view) ? 'block' : 'none');
+  });
+});
+
+/* ===== PDTA editor ===== */
+const pdtaEditor = qs('#pdtaEditor');
+qs('#savePdta').addEventListener('click', ()=>{
+  try{
+    const json = JSON.parse(pdtaEditor.value);
+    localStorage.setItem('elisa_pdta', JSON.stringify(json, null, 2));
+    qs('#pdtaSummary').textContent = `${json.name || 'PDTA salvo'} — ${json.steps ? json.steps.length + ' steps' : ''}`;
+    log('PDTA salvo localmente.');
+    alert('PDTA salvo localmente. Faça upload no servidor se quiser publicar.');
+  }catch(e){
+    alert('JSON inválido: ' + e.message);
+  }
+});
+qs('#downloadPdta').addEventListener('click', ()=>{
+  const content = pdtaEditor.value;
+  const blob = new Blob([content], {type:'application/json;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pdta.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+qs('#loadExamples').addEventListener('click', ()=>{
+  pdtaEditor.value = JSON.stringify({
+    "name":"PDTA - Modelo",
+    "description":"Exemplo gerado",
+    "steps":[
+      {"id":1,"name":"Iniciar","type":"start"},
+      {"id":2,"name":"Receber Input","type":"action"},
+      {"id":3,"name":"Executar Regras","type":"action"},
+      {"id":4,"name":"Responder","type":"end"}
+    ]
+  }, null, 2);
+  log('Exemplo PDTA carregado');
+});
+
+/* pre-load saved PDTA */
+if(localStorage.getItem('elisa_pdta')){
+  qs('#pdtaEditor').value = localStorage.getItem('elisa_pdta');
+  try{
+    const pj = JSON.parse(localStorage.getItem('elisa_pdta'));
+    qs('#pdtaSummary').textContent = `${pj.name || 'PDTA'} — ${pj.steps ? pj.steps.length + ' steps' : ''}`;
+  }catch(e){}
+}
+
+/* ===== Memória dinâmica (localStorage) ===== */
+function renderMemory(){
+  const container = qs('#memoryList');
+  container.innerHTML = '';
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('elisa_mem_'));
+  if(keys.length===0){ container.innerHTML = '<div class="muted">Nenhuma entrada</div>'; qs('#memCount').textContent = '0 entradas'; return; }
+  keys.forEach(k=>{
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    const keyLabel = k.replace('elisa_mem_','');
+    const val = localStorage.getItem(k);
+    item.innerHTML = `<div style="flex:1"><strong>${keyLabel}</strong><div class="muted" style="font-size:13px;max-width:220px;overflow:hidden;text-overflow:ellipsis">${val}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="ghost" onclick="copyMem('${keyLabel}')">Copiar</button>
+        <button class="ghost" onclick="delMem('${keyLabel}')">Deletar</button>
+        <button class="ghost" onclick="editMem('${keyLabel}')">Editar</button>
+      </div>`;
+    container.appendChild(item);
+  });
+  qs('#memCount').textContent = keys.length + ' entradas';
+}
+window.copyMem = (k) => {
+  const v = localStorage.getItem('elisa_mem_'+k);
+  navigator.clipboard?.writeText(v).then(()=> log('Memória copiada: '+k));
+}
+window.delMem = (k) => {
+  if(!confirm('Deletar '+k+'?')) return;
+  localStorage.removeItem('elisa_mem_'+k);
+  renderMemory();
+  log('Memória removida: '+k);
+}
+window.editMem = (k) => {
+  qs('#memKey').value = k;
+  qs('#memValue').value = localStorage.getItem('elisa_mem_'+k) || '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+qs('#addMem').addEventListener('click', ()=>{
+  const k = qs('#memKey').value.trim();
+  const v = qs('#memValue').value;
+  if(!k){ alert('Informe uma chave'); return; }
+  localStorage.setItem('elisa_mem_'+k, v);
+  renderMemory();
+  log('Memória adicionada: '+k);
+  qs('#memKey').value=''; qs('#memValue').value='';
+});
+qs('#updateMem').addEventListener('click', ()=>{
+  const k = qs('#memKey').value.trim();
+  const v = qs('#memValue').value;
+  if(!k){ alert('Informe uma chave'); return; }
+  localStorage.setItem('elisa_mem_'+k, v);
+  renderMemory();
+  log('Memória atualizada: '+k);
+});
+qs('#exportMemory').addEventListener('click', ()=>{
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('elisa_mem_'));
+  const obj = {};
+  keys.forEach(k=> obj[k.replace('elisa_mem_','')] = localStorage.getItem(k));
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='elisa_memory.json'; a.click(); URL.revokeObjectURL(a.href);
+});
+qs('#importMemory').addEventListener('click', ()=>{
+  const input = document.createElement('input'); input.type='file'; input.accept='application/json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try{
+        const obj = JSON.parse(ev.target.result);
+        Object.keys(obj).forEach(k => localStorage.setItem('elisa_mem_'+k, obj[k]));
+        renderMemory(); log('Memória importada');
+        alert('Memória importada com sucesso');
+      }catch(er){ alert('JSON inválido: '+er.message) }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+});
+qs('#clearMemoryBtn').addEventListener('click', ()=>{
+  if(!confirm('Limpar toda a memória local?')) return;
+  Object.keys(localStorage).filter(k=>k.startsWith('elisa_mem_')).forEach(k=>localStorage.removeItem(k));
+  renderMemory(); log('Memória limpa');
+});
+qs('#clearMemory').addEventListener('click', ()=> qs('#clearMemoryBtn').click());
+
+renderMemory();
+
+/* ===== Files (client-side) ===== */
+let filesStore = []; // {name, blob}
+qs('#btnUpload').addEventListener('click', ()=> qs('#fileUploader').click());
+qs('#fileUploader').addEventListener('change', (e)=>{
+  const list = Array.from(e.target.files);
+  list.forEach(f=>{
+    filesStore.push({name:f.name, blob:f});
+  });
+  renderFiles();
+  log(list.length + ' arquivo(s) carregado(s) localmente');
+});
+function renderFiles(){
+  const area = qs('#fileListArea');
+  area.innerHTML = '';
+  if(filesStore.length===0){ area.innerHTML = '<div class="muted">Nenhum arquivo carregado.</div>'; qs('#filesCount').textContent = '0'; return; }
+  filesStore.forEach((f,idx)=>{
+    const el = document.createElement('div');
+    el.className = 'file-item';
+    el.innerHTML = `<div style="flex:1"><strong>${f.name}</strong><div class="muted" style="font-size:13px">Tamanho: ${f.blob.size} bytes</div></div>
+      <div style="display:flex;gap:6px">
+        <button onclick="downloadFile(${idx})">Baixar</button>
+        <button onclick="removeFile(${idx})" style="color:var(--danger)">Remover</button>
+      </div>`;
+    area.appendChild(el);
+  });
+  qs('#filesCount').textContent = filesStore.length;
+}
+window.downloadFile = (idx) => {
+  const f = filesStore[idx];
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(f.blob);
+  a.download = f.name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+window.removeFile = (idx) => {
+  filesStore.splice(idx,1);
+  renderFiles();
+  log('Arquivo removido localmente');
+}
+qs('#btnDownloadZip').addEventListener('click', async ()=>{
+  if(filesStore.length===0){ alert('Nenhum arquivo para zipar'); return; }
+  // Cria zip simples usando JSZip? Não disponível aqui — faremos download individualmente ou enviar para backend.
+  if(!confirm('Baixar todos os arquivos individualmente? Para zip no cliente, instale JSZip no servidor.')) return;
+  filesStore.forEach((f)=> {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(f.blob);
+    a.download = f.name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+});
+
+/* ===== Chat - comunica com backend ===== */
+function getApiUrl(path){
+  if(API.base && API.base.trim()!=='') return API.base.replace(/\/$/,'') + path;
+  return path;
+}
+
+qs('#sendChat').addEventListener('click', sendChatMessage);
+qs('#chatInput').addEventListener('keydown', (e)=> { if(e.key==='Enter') sendChatMessage(); });
+
+async function sendChatMessage(){
+  const txt = qs('#chatInput').value.trim();
+  if(!txt) return;
+  appendChat('me', txt);
+  qs('#chatInput').value = '';
+  try{
+    const url = getApiUrl(API.endpoints.elisa);
+    const res = await fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message: txt})
+    });
+    if(!res.ok) throw new Error('Resposta inválida: '+res.status);
+    const data = await res.json();
+    const answer = data.answer || data.response || JSON.stringify(data);
+    appendChat('elisa', answer);
+    log('Mensagem enviada e resposta recebida');
+  }catch(err){
+    appendChat('elisa', 'Erro na comunicação: ' + err.message);
+    log('Erro: ' + err.message);
+  }
+}
+
+function appendChat(who, text){
+  const c = qs('#chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (who==='me' ? 'me' : 'elisa');
+  div.textContent = text;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+}
+
+/* ===== Start / Stop server (via API) ===== */
+qs('#btnStart').addEventListener('click', async ()=>{
+  try{
+    const url = getApiUrl(API.endpoints.start);
+    const res = await fetch(url, {method:'POST'});
+    if(res.ok){ setStatus('Rodando', 'var(--success)'); log('Start solicitado'); alert('Start solicitado ao servidor'); } else { throw new Error(res.statusText || res.status); }
+  }catch(e){ setStatus('Erro', 'var(--danger)'); log('Erro start: '+e.message); alert('Erro ao pedir start: '+e.message); }
+});
+qs('#btnStop').addEventListener('click', async ()=>{
+  try{
+    const url = getApiUrl(API.endpoints.stop);
+    const res = await fetch(url, {method:'POST'});
+    if(res.ok){ setStatus('Parado', '#ffb86b'); log('Stop solicitado'); alert('Stop solicitado ao servidor'); } else { throw new Error(res.statusText || res.status); }
+  }catch(e){ setStatus('Erro', 'var(--danger)'); log('Erro stop: '+e.message); alert('Erro ao pedir stop: '+e.message); }
+});
+
+/* ===== Settings ===== */
+qs('#apiBase').value = API.base;
+qs('#saveSettings').addEventListener('click', ()=>{
+  const v = qs('#apiBase').value.trim();
+  API.base = v;
+  localStorage.setItem('elisa_api_base', v);
+  log('Configurações salvas: API base = ' + (v||'(relativo)'));
+  alert('Configurações salvas');
+});
+qs('#resetSettings').addEventListener('click', ()=>{
+  if(!confirm('Resetar configurações?')) return;
+  API.base = DEFAULT_API_BASE;
+  localStorage.removeItem('elisa_api_base');
+  qs('#apiBase').value = API.base;
+  log('Configurações resetadas');
+});
+
+/* ===== Quick actions ===== */
+qs('#editPDTA').addEventListener('click', ()=> qsa('.menu button').forEach(b=> { if(b.dataset.view==='pdta'){ b.click(); window.scrollTo({top:0,behavior:'smooth'}) }}));
+qs('#openMemory').addEventListener('click', ()=> qsa('.menu button').forEach(b=> { if(b.dataset.view==='memory') b.click(); }));
+qs('#openLog').addEventListener('click', ()=> { alert(qs('#logArea').innerText || 'Sem logs'); });
+
+qs('#clearLogs').addEventListener('click', ()=> { qs('#logArea').innerHTML = 'Sem logs.'; log('Logs limpos'); });
+
+/* ===== Backup local PDTA button ===== */
+qs('#backupBtn').addEventListener('click', ()=>{
+  const p = localStorage.getItem('elisa_pdta');
+  if(!p){ alert('Nenhum PDTA salvo localmente. Salve no Editor primeiro.'); return; }
+  const a = document.createElement('a');
+  const blob = new Blob([p], {type:'application/json'});
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pdta-backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  log('Backup PDTA feito');
+});
+
+/* ===== Theme buttons ===== */
+qs('#themePS').addEventListener('click', ()=>{
+  document.body.style.background = 'radial-gradient(1200px 600px at 10% 10%, rgba(111,91,255,0.04), transparent), linear-gradient(180deg, #061021 0%, #05101a 45%, #031017 100%)';
+  log('Tema PS4 aplicado');
+});
+qs('#themeDark').addEventListener('click', ()=>{
+  document.body.style.background = 'linear-gradient(180deg,#021018,#031018)';
+  log('Tema Dark aplicado');
+});
+
+/* ===== Inicialização ===== */
+(function init(){
+  setStatus(API.base ? 'Configurado (API externa)' : 'Relativo (sem API base)', API.base ? 'lightgreen' : 'orange');
+  renderFiles();
+  log('UI inicializado');
+})();
+</script>
+</body>
+</html>
