@@ -1,66 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ELISA OS</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Console Elisa</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<!-- DESKTOP -->
-<div id="desktop">
-
-    <!-- Ícones no desktop -->
-    <div class="desktop-icon" onclick="openApp('jogos')">
-        <img src="assets/icons/jogos.png">
-        <span>Jogos</span>
+    <div id="menu">
+        <!-- Ícones de jogos, Netflix, etc -->
+        <div class="app-icon" data-app="jogo64">Nintendo 64</div>
+        <div class="app-icon" data-app="netflix">Netflix</div>
+        <!-- Adicione outros ícones aqui -->
     </div>
 
-    <div class="desktop-icon" onclick="openApp('media')">
-        <img src="assets/icons/media.png">
-        <span>Mídia</span>
+    <div id="app-container">
+        <!-- Aqui os apps serão carregados dinamicamente -->
     </div>
 
-    <div class="desktop-icon" onclick="openApp('youtube')">
-        <img src="assets/icons/youtube.png">
-        <span>YouTube</span>
-    </div>
-
-    <div class="desktop-icon" onclick="openApp('netflix')">
-        <img src="assets/icons/netflix.png">
-        <span>Netflix</span>
-    </div>
-
-    <div class="desktop-icon" onclick="openApp('config')">
-        <img src="assets/icons/config.png">
-        <span>Configurações</span>
-    </div>
-
-</div>
-
-<!-- BARra de TAREFAS -->
-<div id="taskbar">
-    <div id="start-button" onclick="toggleStartMenu()">🪟</div>
-    <div id="task-icons"></div>
-    <div id="clock"></div>
-</div>
-
-<!-- MENU INICIAR -->
-<div id="start-menu">
-    <div class="start-menu-header">ELISA OS</div>
-
-    <div class="start-app" onclick="openApp('jogos')">🎮 Jogos</div>
-    <div class="start-app" onclick="openApp('media')">🎵 Player de Mídia</div>
-    <div class="start-app" onclick="openApp('youtube')">▶️ YouTube</div>
-    <div class="start-app" onclick="openApp('netflix')">🎬 Netflix</div>
-    <div class="start-app" onclick="openApp('config')">⚙️ Configurações</div>
-
-</div>
-
-<!-- JANELAS DINÂMICAS AQUI -->
-<div id="windows"></div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
