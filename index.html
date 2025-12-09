@@ -1,261 +1,32 @@
+Running Elisaiachat.html remotely..
+
+/box/script.js:1
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Elisa OS - Windows 11 Full</title>
-<style>
-/* Reset e base */
-body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    font-family: "Segoe UI", Arial, sans-serif;
-    overflow: hidden;
-    background: linear-gradient(135deg, #4e54c8, #8f94fb);
-    transition: background 1s;
-}
+^
 
-/* Desktop */
-#desktop {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
+SyntaxError: Unexpected token '<'
+    at Module._compile (internal/modules/cjs/loader.js:895:18)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:995:10)
+    at Module.load (internal/modules/cjs/loader.js:815:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:727:14)
+    at Function.Module.runMain (internal/modules/cjs/loader.js:1047:10)
+    at internal/main/run_main_module.js:17:11
 
-/* Ícones de apps */
-.app-icon {
-    width: 80px;
-    text-align: center;
-    margin: 20px;
-    color: white;
-    cursor: pointer;
-    display: inline-block;
-    transition: transform 0.2s;
-}
-.app-icon:hover { transform: scale(1.1); }
-.app-icon img { width: 60px; height: 60px; border-radius: 12px; }
 
-/* Barra de tarefas */
-#taskbar {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 50px;
-    background: rgba(30,30,30,0.85);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
-}
+Program finished in 0.034s with 6900.0KB of memory.Execution completed in 1.357s
+Error: Running Elisaiachat.html remotely..
 
-/* Botão iniciar */
-#start-button {
-    width: 40px;
-    height: 40px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-#start-button:hover { background: rgba(255,255,255,0.2); }
+/box/script.js:1
+<!DOCTYPE html>
+^
 
-/* Relógio */
-#clock { color: white; font-size: 14px; }
+SyntaxError: Unexpected token '<'
+    at Module._compile (internal/modules/cjs/loader.js:895:18)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:995:10)
+    at Module.load (internal/modules/cjs/loader.js:815:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:727:14)
+    at Function.Module.runMain (internal/modules/cjs/loader.js:1047:10)
+    at internal/main/run_main_module.js:17:11
 
-/* Menu iniciar */
-#start-menu {
-    position: absolute;
-    bottom: 50px;
-    left: 10px;
-    width: 300px;
-    max-height: 400px;
-    background: rgba(40,40,40,0.95);
-    border-radius: 12px;
-    padding: 10px;
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    overflow-y: auto;
-}
 
-/* Itens do menu */
-.start-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.start-menu-item:hover { background: rgba(255,255,255,0.15); }
-
-/* Container de apps */
-#app-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 50px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-/* Iframe apps */
-iframe {
-    width: 90%;
-    height: 90%;
-    border-radius: 12px;
-    border: none;
-    background: #000;
-}
-
-/* Animação de abertura de apps */
-@keyframes openApp {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-.opening { animation: openApp 0.3s ease; }
-</style>
-</head>
-<body>
-<div id="desktop">
-    <!-- Desktop icons -->
-    <div id="desktop-icons">
-        <div class="app-icon" data-app="nes">
-            <img src="https://img.icons8.com/color/96/000000/nes-console.png"/>
-            <div>NES</div>
-        </div>
-        <div class="app-icon" data-app="snes">
-            <img src="https://img.icons8.com/color/96/000000/snes.png"/>
-            <div>SNES</div>
-        </div>
-        <div class="app-icon" data-app="netflix">
-            <img src="https://img.icons8.com/color/96/000000/netflix.png"/>
-            <div>Netflix</div>
-        </div>
-        <div class="app-icon" data-app="explorer">
-            <img src="https://img.icons8.com/color/96/000000/folder-invoices.png"/>
-            <div>Explorador</div>
-        </div>
-        <div class="app-icon" data-app="music">
-            <img src="https://img.icons8.com/color/96/000000/musical-notes.png"/>
-            <div>Música</div>
-        </div>
-    </div>
-
-    <!-- Container de apps -->
-    <div id="app-container">
-        <p style="color:white;">Clique em um ícone ou no menu iniciar para abrir um aplicativo.</p>
-    </div>
-
-    <!-- Barra de tarefas -->
-    <div id="taskbar">
-        <div id="start-button">&#9776;</div>
-        <div id="clock"></div>
-    </div>
-
-    <!-- Menu iniciar -->
-    <div id="start-menu">
-        <div class="start-menu-item" data-app="nes">
-            <img src="https://img.icons8.com/color/48/000000/nes-console.png" width="32" height="32"/> NES
-        </div>
-        <div class="start-menu-item" data-app="snes">
-            <img src="https://img.icons8.com/color/48/000000/snes.png" width="32" height="32"/> SNES
-        </div>
-        <div class="start-menu-item" data-app="netflix">
-            <img src="https://img.icons8.com/color/48/000000/netflix.png" width="32" height="32"/> Netflix
-        </div>
-        <div class="start-menu-item" data-app="explorer">
-            <img src="https://img.icons8.com/color/48/000000/folder-invoices.png" width="32" height="32"/> Explorador
-        </div>
-        <div class="start-menu-item" data-app="music">
-            <img src="https://img.icons8.com/color/48/000000/musical-notes.png" width="32" height="32"/> Música
-        </div>
-    </div>
-</div>
-
-<script>
-// --- Menu iniciar toggle ---
-const startButton = document.getElementById("start-button");
-const startMenu = document.getElementById("start-menu");
-startButton.addEventListener("click", () => {
-    startMenu.style.display = startMenu.style.display === "flex" ? "none" : "flex";
-});
-
-// --- Relógio ---
-function updateClock() {
-    const clock = document.getElementById("clock");
-    const now = new Date();
-    clock.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// --- Função para abrir apps ---
-const appContainer = document.getElementById("app-container");
-function loadApp(app){
-    appContainer.innerHTML = "";
-    let iframe;
-    switch(app){
-        case "nes":
-            iframe = document.createElement("iframe");
-            iframe.src = "https://emulatorjs.org/play?core=nes&game=mario.nes";
-            break;
-        case "snes":
-            iframe = document.createElement("iframe");
-            iframe.src = "https://emulatorjs.org/play?core=snes&game=super_mario_snes.smc";
-            break;
-        case "netflix":
-            iframe = document.createElement("iframe");
-            iframe.src = "https://www.netflix.com";
-            break;
-        case "explorer":
-            appContainer.innerHTML = `<p style="color:#0f0; font-size:1.2em; text-align:center;">Explorador de arquivos (placeholder)</p>`;
-            return;
-        case "music":
-            appContainer.innerHTML = `<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M"></iframe>`;
-            return;
-        default:
-            appContainer.innerHTML = `<p style="color:red; text-align:center;">Aplicativo não encontrado</p>`;
-            return;
-    }
-    iframe.classList.add("opening");
-    appContainer.appendChild(iframe);
-}
-
-// --- Desktop icons ---
-document.querySelectorAll(".app-icon").forEach(icon=>{
-    icon.addEventListener("click", ()=> loadApp(icon.getAttribute("data-app")));
-});
-
-// --- Menu iniciar items ---
-document.querySelectorAll(".start-menu-item").forEach(item=>{
-    item.addEventListener("click", ()=>{
-        loadApp(item.getAttribute("data-app"));
-        startMenu.style.display = "none";
-    });
-});
-
-// --- Fundo animado simples ---
-let gradientDirection = 0;
-setInterval(()=>{
-    gradientDirection += 1;
-    document.body.style.background = `linear-gradient(${gradientDirection}deg, #4e54c8, #8f94fb)`;
-}, 50);
-
-// --- Som de clique ---
-const clickSound = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
-document.querySelectorAll(".app-icon, .start-menu-item, #start-button").forEach(el=>{
-    el.addEventListener("click", ()=> clickSound.play());
-});
-</script>
-</body>
-</html>
+Program finished in 0.034s with 6900.0KB of memory.
