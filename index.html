@@ -1,569 +1,706 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ELISA Ultra — Single File</title>
+<title>ELISA — Painel Único</title>
 <style>
-/* ---------- RESET & BASE ---------- */
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
-  color:#fff; -webkit-font-smoothing:antialiased;
-  display:flex;flex-direction:column;min-height:100vh;overflow:hidden;
-}
+  /* ===== Reset e tipografia ===== */
+  :root{
+    --bg:#0b1220;
+    --panel:#0f1624;
+    --accent:#2fa1ff;
+    --muted:#9aa6b2;
+    --glass: rgba(255,255,255,0.04);
+    --glass-2: rgba(255,255,255,0.02);
+    --success: #4caf50;
+    --danger: #ff5252;
+    --glass-border: rgba(255,255,255,0.06);
+    --radius:12px;
+    --shadow: 0 6px 18px rgba(2,6,23,0.6);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(47,161,255,0.06), transparent),
+                linear-gradient(180deg, #071021 0%, #05101a 45%, #031017 100%);
+    color:#e6f1fb;
+    font-size:15px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:20px;
+  }
 
-/* ---------- HEADER ---------- */
-header{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:12px 18px;background:rgba(0,0,0,0.5);border-bottom:1px solid rgba(255,255,255,0.06);
-  backdrop-filter: blur(6px);
-}
-.header-left{display:flex;align-items:center;gap:12px}
-.logo{
-  width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#1f6feb,#7b61ff);
-  display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:18px;box-shadow:0 6px 18px rgba(0,0,0,.4)
-}
-.header-title{font-weight:700;font-size:16px}
-.header-right{display:flex;align-items:center;gap:8px}
+  /* ===== Layout principal ===== */
+  .app{
+    max-width:1200px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns: 300px 1fr 360px;
+    gap:18px;
+    align-items:start;
+  }
 
-/* ---------- LOGIN / DESKTOP ---------- */
-#login-screen, #desktop {
-  flex:1; display:flex; align-items:center; justify-content:center; padding:18px;
-}
-.login-box{
-  width:360px; background:rgba(0,0,0,0.6); padding:18px;border-radius:12px;
-  border:1px solid rgba(255,255,255,0.06); box-shadow:0 12px 30px rgba(0,0,0,0.6);
-}
-.login-box h2{margin-bottom:12px}
-.login-box input{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:#fff}
-.login-box button{width:100%;padding:10px;margin-top:12px;border-radius:8px;border:none;background:#7b61ff;color:#fff;font-weight:700;cursor:pointer}
+  /* Mobile */
+  @media (max-width:980px){
+    .app{grid-template-columns:1fr; padding-bottom:60px}
+    header .right-controls{display:none}
+  }
 
-/* ---------- DESKTOP LAYOUT ---------- */
-.desktop-inner{width:100%;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
-.menu{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:12px}
-.app-btn{
-  width:100px;height:100px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
-  border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;
-  transition:transform .12s ease, background .12s ease; color:#fff;
-}
-.app-btn:hover{transform:translateY(-6px);background:rgba(255,255,255,0.95);color:#111}
-.app-btn svg{width:36px;height:36px;display:block;}
+  header{
+    grid-column:1/-1;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+  }
+  .title{
+    display:flex;gap:12px;align-items:center;
+  }
+  .logo{
+    width:56px;height:56px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent), #6f5bff);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow: 0 6px 24px rgba(47,161,255,0.08);
+    font-weight:700;
+    color:#021025;
+  }
+  h1{font-size:18px;margin:0}
+  p.sub{margin:0;color:var(--muted);font-size:13px}
 
-/* ---------- WINDOWS AREA ---------- */
-.windows-area{
-  width:95%;max-width:1200px;height:56vh;margin-top:18px;background:rgba(0,0,0,0.18);
-  border-radius:12px;border:1px solid rgba(255,255,255,0.04);position:relative;overflow:hidden;padding:8px;
-}
+  .right-controls{display:flex;gap:8px;align-items:center}
 
-/* ---------- WINDOW ---------- */
-.win{
-  position:absolute; top:20px; left:20px; width:360px; min-height:220px;
-  background:linear-gradient(180deg,rgba(0,0,0,0.92),rgba(0,0,0,0.86));
-  border-radius:12px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 18px 50px rgba(0,0,0,0.7);
-  display:flex;flex-direction:column;overflow:hidden;animation:pop .14s ease;
-}
-@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
-.win .head{
-  padding:10px 12px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center;cursor:grab;
-  border-bottom:1px solid rgba(255,255,255,0.03)
-}
-.win .head .title{font-weight:700}
-.win .head .controls{display:flex;gap:8px}
-.ctrl-btn{width:30px;height:28px;border-radius:6px;border:none;background:transparent;color:#fff;cursor:pointer;font-weight:700}
-.win .body{padding:12px;flex:1;overflow:auto;font-size:14px;line-height:1.45}
+  /* ===== Painéis ===== */
+  .panel{
+    background:linear-gradient(180deg,var(--panel), rgba(10,15,22,0.84));
+    border-radius:var(--radius);
+    padding:14px;
+    box-shadow:var(--shadow);
+    border:1px solid var(--glass-border);
+  }
 
-/* ---------- MODAL ---------- */
-.modal-back{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:9999}
-.modal{width:92%;max-width:480px;background:#0d0d0d;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.06)}
-.modal h3{margin-bottom:10px}
-.modal input, .modal textarea{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:#fff}
+  /* Sidebar */
+  .sidebar .menu{display:flex;flex-direction:column;gap:8px}
+  .menu button{
+    text-align:left;padding:10px;border-radius:10px;border:none;background:transparent;color:inherit;
+    display:flex;gap:10px;align-items:center;font-weight:600;cursor:pointer;
+  }
+  .menu button.active{background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent)}
+  .small{font-size:13px;color:var(--muted);margin-top:8px}
 
-/* ---------- HELPERS ---------- */
-.hint{opacity:.85;font-size:13px;color:#ddd}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#ff6b6b;color:#111;font-weight:700;font-size:12px}
+  /* Main central area */
+  .main{min-height:520px; display:flex;flex-direction:column;gap:12px}
+  .row{display:flex;gap:12px}
+  .grow{flex:1}
 
-/* ---------- RESPONSIVE ---------- */
-@media(max-width:820px){
-  .app-btn{width:88px;height:88px}
-  .win{width:86%;left:7%}
-  .windows-area{height:50vh}
-}
+  textarea.code{
+    width:100%;min-height:260px;background:transparent;border:1px dashed var(--glass-border);
+    color: #dff1ff;padding:12px;border-radius:10px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+    resize:vertical;outline:none;
+  }
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{
+    padding:10px 12px;border-radius:10px;border:none;background:var(--accent);color:#021025;font-weight:700;cursor:pointer;
+  }
+  .btn.ghost{background:transparent;border:1px solid var(--glass-border);color:var(--muted);font-weight:600}
+  .btn.warn{background:var(--danger);color:white}
+  .btn.ok{background:var(--success);color:white}
+
+  /* Right column (chat/logs) */
+  .chat{
+    display:flex;flex-direction:column;height:520px;
+  }
+  .chat-messages{
+    overflow:auto;padding:12px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    flex:1;margin-bottom:8px;border:1px solid var(--glass-border)
+  }
+  .msg{margin:8px 0;padding:10px;border-radius:10px;max-width:86%}
+  .msg.me{background:rgba(47,161,255,0.12);align-self:flex-end;color:#d6f3ff}
+  .msg.elisa{background:rgba(255,255,255,0.02);align-self:flex-start;color:var(--muted)}
+  .chat-input{display:flex;gap:8px}
+  .chat-input input{flex:1;padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:inherit}
+
+  /* small widgets */
+  .widget{padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid var(--glass-border)}
+  .kv{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
+  .muted{color:var(--muted);font-size:13px}
+
+  .file-list{max-height:160px;overflow:auto}
+  .file-item{display:flex;justify-content:space-between;align-items:center;padding:6px;border-radius:8px;margin:6px 0}
+  .file-item button{padding:6px 8px;border-radius:8px;border:none;background:transparent;color:var(--accent);cursor:pointer}
+
+  footer{grid-column:1/-1;margin-top:12px;color:var(--muted);font-size:13px;text-align:center}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="header-left">
-    <div class="logo">EL</div>
-    <div>
-      <div class="header-title">ELISA Ultra</div>
-      <div class="hint">Console de produtividade — multi-janelas</div>
+<div class="app">
+  <header>
+    <div class="title">
+      <div class="logo">EL</div>
+      <div>
+        <h1>ELISA — Painel Único</h1>
+        <p class="sub">PDTA · Memória Dinâmica · Gerenciador · Chat</p>
+      </div>
     </div>
-  </div>
-  <div class="header-right">
-    <div id="statusBadge" class="badge" style="display:none">Alta</div>
-  </div>
-</header>
+    <div class="right-controls">
+      <div class="kv muted">Status: <span id="statusText">Desconectado</span></div>
+      <button class="btn" id="btnStart">Start</button>
+      <button class="btn ghost" id="btnStop">Stop</button>
+      <button class="btn ghost" id="backupBtn">Backup</button>
+    </div>
+  </header>
 
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-box">
-    <h2>Entrar na ELISA Ultra</h2>
-    <input id="username" placeholder="Usuário" />
-    <input id="password" placeholder="Senha" type="password" />
-    <button id="btnLogin">Entrar</button>
-    <div style="margin-top:8px" class="hint">Use qualquer usuário/senha para demo.</div>
-  </div>
-</div>
-
-<!-- DESKTOP -->
-<div id="desktop" class="hidden" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:flex-start">
-  <div class="desktop-inner">
-    <div style="width:95%;max-width:1200px;display:flex;justify-content:space-between;align-items:center">
-      <div class="hint">Bem-vindo — ELISA Ultra (single-file)</div>
-      <div><button id="btnLogout" style="padding:6px 10px;border-radius:8px;border:none;background:#7b61ff;color:#fff;cursor:pointer">Sair</button></div>
+  <!-- SIDEBAR -->
+  <aside class="panel sidebar">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>Menu</strong>
+      <small class="muted">v1.0</small>
+    </div>
+    <div class="menu" style="margin-top:12px">
+      <button class="active" data-view="dashboard">Dashboard</button>
+      <button data-view="pdta">Editor PDTA</button>
+      <button data-view="memory">Memória</button>
+      <button data-view="files">Arquivos</button>
+      <button data-view="settings">Configurações</button>
     </div>
 
-    <div class="menu" id="menu">
-      <!-- buttons created by JS for icons + label, kept empty here for progressive enhancement -->
+    <div class="small">Atalhos</div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn ghost" id="openLog">Ver Logs</button>
+      <button class="btn ghost" id="clearMemory">Limpar Memória</button>
     </div>
 
-    <div class="windows-area" id="windows-area"></div>
-  </div>
-</div>
-
-<!-- MODAL -->
-<div class="modal-back" id="modalBack">
-  <div class="modal" id="modalBox" role="dialog" aria-modal="true">
-    <h3 id="modalTitle">Modal</h3>
-    <div id="modalBody"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-      <button id="modalCancel" style="padding:8px 12px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff">Fechar</button>
-      <button id="modalConfirm" style="padding:8px 12px;border-radius:8px;background:#7b61ff;color:#fff;border:none">OK</button>
+    <div style="margin-top:14px">
+      <div class="muted">Tema</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn" id="themePS">PS4</button>
+        <button class="btn ghost" id="themeDark">Dark</button>
+      </div>
     </div>
-  </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="panel main">
+    <!-- DASHBOARD -->
+    <section id="view-dashboard">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Dashboard</h2>
+          <div class="muted">Resumo rápido da ELISA</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="widget">
+            <div class="muted">Memória ativa</div>
+            <div id="memCount">0 entradas</div>
+          </div>
+          <div class="widget">
+            <div class="muted">Arquivos</div>
+            <div id="filesCount">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <div class="widget grow">
+          <strong>PDTA (Resumo)</strong>
+          <div id="pdtaSummary" class="muted" style="margin-top:8px">Nenhum PDTA carregado.</div>
+        </div>
+        <div style="width:320px;display:flex;flex-direction:column;gap:12px">
+          <div class="widget">
+            <div class="muted">Últimas atividades</div>
+            <div id="activities" style="margin-top:8px" class="muted">Sem atividades</div>
+          </div>
+
+          <div class="widget">
+            <div class="muted">Ações rápidas</div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" id="editPDTA">Abrir editor PDTA</button>
+              <button class="btn ghost" id="openMemory">Abrir Memória</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PDTA EDITOR -->
+    <section id="view-pdta" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Editor PDTA</h2>
+          <div class="muted">Edite o fluxo da PDTA aqui</div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="savePdta">Salvar</button>
+          <button class="btn ghost" id="downloadPdta">Exportar (.json)</button>
+          <button class="btn ghost" id="loadExamples">Exemplo</button>
+        </div>
+      </div>
+
+      <textarea id="pdtaEditor" class="code" placeholder='{"name":"PDTA exemplo","steps":[...]}'>
+{
+  "name": "PDTA - Exemplo",
+  "description": "Fluxo exemplo para iniciar",
+  "steps": [
+    {"id":1,"name":"Iniciar","type":"start"},
+    {"id":2,"name":"Coletar dados","type":"action"},
+    {"id":3,"name":"Analisar","type":"action"},
+    {"id":4,"name":"Responder","type":"end"}
+  ]
+}
+      </textarea>
+    </section>
+
+    <!-- MEMORY -->
+    <section id="view-memory" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Memória Dinâmica</h2>
+          <div class="muted">Visualize e edite as entradas</div>
+        </div>
+        <div class="controls">
+          <button class="btn ghost" id="importMemory">Importar</button>
+          <button class="btn" id="exportMemory">Exportar</button>
+          <button class="btn warn" id="clearMemoryBtn">Limpar</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:12px">
+        <div style="flex:1">
+          <div id="memoryList" class="widget file-list">Nenhuma entrada</div>
+        </div>
+        <div style="width:320px">
+          <div class="widget">
+            <div class="muted">Nova entrada</div>
+            <input id="memKey" placeholder="chave" style="width:100%;padding:8px;margin-top:6px;border-radius:8px;background:transparent;border:1px solid var(--glass-border)" />
+            <textarea id="memValue" placeholder='valor (json ou texto)' style="width:100%;margin-top:6px;padding:8px;border-radius:8px;background:transparent;border:1px solid var(--glass-border);min-height:120px"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" id="addMem">Adicionar</button>
+              <button class="btn ghost" id="updateMem">Atualizar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILES -->
+    <section id="view-files" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Arquivos</h2>
+          <div class="muted">Upload / Download / Backup</div>
+        </div>
+        <div class="controls">
+          <input type="file" id="fileUploader" multiple style="display:none" />
+          <button class="btn" id="btnUpload">Upload</button>
+          <button class="btn ghost" id="btnDownloadZip">Download Zip</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="file-list panel" id="fileListArea">
+        <div class="muted">Nenhum arquivo carregado.</div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" style="display:none">
+      <h2>Configurações</h2>
+      <div class="muted">Ajuste as URLs do backend e opções</div>
+      <div style="margin-top:12px;display:flex;gap:12px;flex-direction:column">
+        <label class="muted">API Base</label>
+        <input id="apiBase" placeholder="https://meu-servidor.com" style="padding:8px;border-radius:8px;border:1px solid var(--glass-border);background:transparent" />
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="saveSettings">Salvar</button>
+          <button class="btn ghost" id="resetSettings">Reset</button>
+        </div>
+      </div>
+      <div style="margin-top:12px" class="widget">
+        <div class="muted">Observações</div>
+        <ul style="margin:6px 0;color:var(--muted)">
+          <li>Endpoint de chat padrão: <code>/api/elisa</code> (POST JSON {message:"..."})</li>
+          <li>Start/Stop: <code>/api/start</code>, <code>/api/stop</code> (POST)</li>
+          <li>Backup PDTA: baixe do editor e suba no servidor conforme sua infra</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- RIGHT COLUMN: CHAT E LOGS -->
+  <aside class="panel" style="display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong>Chat — ELISA</strong>
+      <div class="muted">Integração</div>
+    </div>
+
+    <div class="chat">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="chatInput" placeholder="Escreva para a ELISA..." />
+        <button class="btn" id="sendChat">Enviar</button>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="widget" style="margin-top:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Logs</strong><div class="muted">Últimas mensagens do sistema</div></div>
+        <button class="btn ghost" id="clearLogs">Limpar</button>
+      </div>
+      <div id="logArea" style="margin-top:10px;max-height:120px;overflow:auto" class="muted">Sem logs.</div>
+    </div>
+  </aside>
+
+  <footer>
+    ELISA — Painel único • Salve este arquivo e suba no Replit dentro da pasta `static/` ou abra localmente. Desenvolvido por você e com ajuda do ChatGPT.
+  </footer>
 </div>
 
 <script>
-/* ===========================
-   ELISA ULTRA — SINGLE FILE
-   =========================== */
+/*
+  ELISA Single HTML UI
+  - Guarda configurações em localStorage
+  - Integra com backend através de API_BASE + endpoints
+  - Manipula PDTA, memória, arquivos e chat
+*/
 
-/* ---------- UTIL ---------- */
-const $ = s => document.querySelector(s);
-const create = (tag, props={}) => { const e=document.createElement(tag); if(props.class) e.className = props.class; if(props.html) e.innerHTML = props.html; if(props.text) e.textContent = props.text; return e; };
+/* ===== Configurações iniciais ===== */
+const DEFAULT_API_BASE = ''; // se deixar vazio usa caminhos relativos (ex: /api/elisa)
+const API = {
+  base: localStorage.getItem('elisa_api_base') || DEFAULT_API_BASE,
+  endpoints: {
+    elisa: '/api/elisa',
+    start: '/api/start',
+    stop: '/api/stop'
+  }
+};
 
-/* ---------- STATE ---------- */
-const windowsArea = $('#windows-area');
-let openApps = {}; // appName -> element (window)
-let maxOpenApps = 10;
-let zBase = 100;
-let winCount = 0;
+const qs = sel => document.querySelector(sel);
+const qsa = sel => Array.from(document.querySelectorAll(sel));
 
-/* ---------- APPS LIST (all apps internal) ---------- */
-const APPS = [
-  { id:'office', name:'Office' },
-  { id:'chatgpt', name:'ChatGPT' },
-  { id:'teams', name:'Teams' },
-  { id:'whatsapp', name:'WhatsApp' },
-  { id:'spotify', name:'Spotify' },
-  { id:'youtube', name:'YouTube' },
-  { id:'netflix', name:'Netflix' },
-  { id:'prime', name:'Prime Video' },
-  { id:'games', name:'Games' },
-  { id:'files', name:'Arquivos' }
-];
+/* ===== Helpers ===== */
+function log(msg){
+  const area = qs('#logArea');
+  const now = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.textContent = `[${now}] ${msg}`;
+  area.prepend(line);
+  // keep max 200 lines
+  if(area.children.length > 200) area.removeChild(area.lastChild);
+}
 
-/* ---------- BOOT: build menu buttons ---------- */
-function buildMenu(){
-  const menu = $('#menu');
-  menu.innerHTML = '';
-  APPS.forEach(a=>{
-    const btn = create('div',{class:'app-btn', html:`
-      ${iconSVG(a.id)}
-      <div style="font-size:13px">${a.name}</div>
-    `});
-    btn.dataset.app = a.id;
-    btn.onclick = ()=> openAppSingle(a.id);
-    menu.appendChild(btn);
+function setStatus(text, color){
+  qs('#statusText').textContent = text;
+  if(color) qs('#statusText').style.color = color;
+}
+
+/* ===== Navigation ===== */
+qsa('.menu button').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    qsa('.menu button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    qsa('main section').forEach(s=> s.style.display = (s.id === 'view-'+view) ? 'block' : 'none');
   });
-}
-buildMenu();
+});
 
-/* ---------- ICONS (inline SVG by id) ---------- */
-function iconSVG(id){
-  const base = 'currentColor';
-  switch(id){
-    case 'office': return `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="14" height="18" rx="2" stroke="${base}" stroke-width="1.2"/><path d="M17 3v6h4" stroke="${base}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    case 'chatgpt': return `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="${base}" stroke-width="1.2"/></svg>`;
-    case 'teams': return `<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="2.5" stroke="${base}" stroke-width="1.2"/><path d="M9 10.5v4" stroke="${base}" stroke-width="1.1"/></svg>`;
-    case 'whatsapp': return `<svg viewBox="0 0 24 24" fill="none"><path d="M21 12A9 9 0 1 1 12 3a1 1 0 0 0-.9.6L9 8l-2 1 2 1 1 3 2 1" stroke="${base}" stroke-width="1.2"/></svg>`;
-    case 'spotify': return `<svg viewBox="0 0 24 24" fill="none"><path d="M3 9a13 13 0 0 1 18 0" stroke="${base}" stroke-width="1.2"/></svg>`;
-    case 'youtube': return `<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="${base}" stroke-width="1.2"/><path d="M10 9l6 3-6 3V9z" stroke="${base}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    case 'netflix': return `<svg viewBox="0 0 24 24" fill="none"><path d="M6 4v16l4-1V5z" stroke="${base}" stroke-width="1.2"/></svg>`;
-    case 'prime': return `<svg viewBox="0 0 24 24" fill="none"><path d="M3 12h18" stroke="${base}" stroke-width="1.2"/></svg>`;
-    case 'games': return `<svg viewBox="0 0 24 24" fill="none"><path d="M6 10h4M10 6v8" stroke="${base}" stroke-width="1.2"/></svg>`;
-    case 'files': return `<svg viewBox="0 0 24 24" fill="none"><path d="M3 7v10a2 2 0 0 0 2 2h14" stroke="${base}" stroke-width="1.2"/></svg>`;
-    default: return `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="${base}" stroke-width="1.2"/></svg>`;
+/* ===== PDTA editor ===== */
+const pdtaEditor = qs('#pdtaEditor');
+qs('#savePdta').addEventListener('click', ()=>{
+  try{
+    const json = JSON.parse(pdtaEditor.value);
+    localStorage.setItem('elisa_pdta', JSON.stringify(json, null, 2));
+    qs('#pdtaSummary').textContent = `${json.name || 'PDTA salvo'} — ${json.steps ? json.steps.length + ' steps' : ''}`;
+    log('PDTA salvo localmente.');
+    alert('PDTA salvo localmente. Faça upload no servidor se quiser publicar.');
+  }catch(e){
+    alert('JSON inválido: ' + e.message);
   }
-}
-
-/* ---------- OPEN APP (single-file behavior) ---------- */
-function openAppSingle(appId){
-  // limit
-  if(Object.values(openApps).filter(w=>w).length >= maxOpenApps){
-    alert('Sistema com muitas janelas abertas. Feche algumas primeiro.');
-    return;
-  }
-  if(openApps[appId]) {
-    // bring to front
-    openApps[appId].style.zIndex = ++zBase;
-    return;
-  }
-
-  // create window
-  winCount++;
-  const win = create('div',{class:'win'});
-  win.style.top = (20 + 20*winCount) + 'px';
-  win.style.left = (20 + 20*winCount) + 'px';
-  win.style.zIndex = ++zBase;
-
-  // header
-  const head = create('div',{class:'head'});
-  const title = create('div',{class:'title', text: appTitle(appId)});
-  const controls = create('div',{class:'controls'});
-  const btnMin = create('button',{class:'ctrl-btn', text: '—'});
-  const btnClose = create('button',{class:'ctrl-btn', text: '✕'});
-  controls.appendChild(btnMin); controls.appendChild(btnClose);
-  head.appendChild(title); head.appendChild(controls);
-
-  // body content based on app
-  const body = create('div',{class:'body'});
-  body.innerHTML = appContentHTML(appId);
-
-  win.appendChild(head); win.appendChild(body);
-  windowsArea.appendChild(win);
-  openApps[appId] = win;
-
-  // controls
-  btnClose.onclick = ()=> closeAppSingle(appId);
-  btnMin.onclick = ()=> {
-    if(body.style.display === 'none'){ body.style.display = 'block'; win.style.height = 'auto'; }
-    else { body.style.display = 'none'; win.style.height = '44px'; }
-  };
-
-  // draggable
-  makeDraggable(win, head);
-
-  // focus
-  win.addEventListener('mousedown', ()=> win.style.zIndex = ++zBase );
-}
-
-/* ---------- CLOSE APP ---------- */
-function closeAppSingle(appId){
-  if(!openApps[appId]) return;
-  try { windowsArea.removeChild(openApps[appId]); } catch(e){}
-  openApps[appId] = null;
-}
-
-/* ---------- DRAGGABLE ---------- */
-function makeDraggable(el, header){
-  header.style.touchAction = 'none';
-  header.onpointerdown = function(e){
-    e.preventDefault();
-    el.style.zIndex = ++zBase;
-    const startX = e.clientX, startY = e.clientY;
-    const rect = el.getBoundingClientRect();
-    const offsetX = startX - rect.left, offsetY = startY - rect.top;
-
-    function move(ev){
-      el.style.left = (ev.clientX - offsetX) + 'px';
-      el.style.top  = (ev.clientY - offsetY) + 'px';
-    }
-    function up(){
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-    }
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
-  };
-}
-
-/* ---------- APP TITLES & CONTENT ---------- */
-function appTitle(id){
-  const a = APPS.find(x=>x.id===id);
-  return a ? a.name : id;
-}
-
-function appContentHTML(id){
-  // Each app has internal (demo) UI — expand as needed
-  switch(id){
-    case 'office':
-      return `
-        <strong>Editor de Texto</strong>
-        <p class="hint">Editor simples — digite e use o botão "Salvar" para exportar texto (demo).</p>
-        <textarea id="officeArea" style="width:100%;height:160px;border-radius:8px;padding:8px;margin-top:8px;background:#0b0b0b;color:#fff;border:1px solid rgba(255,255,255,0.04)"></textarea>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-          <button style="padding:8px 10px;border-radius:8px;border:none;background:#7b61ff;color:#fff" onclick="downloadText()">Salvar</button>
-        </div>
-      `;
-    case 'chatgpt':
-      return chatGPTUI();
-    case 'teams':
-      return `
-        <strong>Teams (demo)</strong>
-        <p class="hint">Sala de reuniões / colaboração (mock).</p>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <input placeholder="Nome da sala" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:#fff"/>
-          <button style="padding:8px 10px;border-radius:8px;border:none;background:#1db954;color:#fff">Criar</button>
-        </div>
-      `;
-    case 'whatsapp':
-      return whatsappUI();
-    case 'spotify':
-      return spotifyUI();
-    case 'youtube':
-      return `<strong>YouTube (demo)</strong><p class="hint">Player de vídeo embed (demo).</p><div style="margin-top:8px"><div style="background:#000;height:180px;border-radius:8px;display:flex;align-items:center;justify-content:center">Vídeo Simulado</div></div>`;
-    case 'netflix':
-      return `<strong>Netflix (demo)</strong><p class="hint">Reprodutor de vídeo (demo).</p><div style="margin-top:8px"><div style="background:#000;height:180px;border-radius:8px;display:flex;align-items:center;justify-content:center">Filme Simulado</div></div>`;
-    case 'prime':
-      return `<strong>Prime Video (demo)</strong><p class="hint">Reprodutor (demo).</p><div style="margin-top:8px"><div style="background:#000;height:180px;border-radius:8px;display:flex;align-items:center;justify-content:center">Conteúdo Simulado</div></div>`;
-    case 'games':
-      return gamesUI();
-    case 'files':
-      return filesUI();
-    default:
-      return `<div>App ${id} — demo.</div>`;
-  }
-}
-
-/* ---------- APP INTERNAL UIs ---------- */
-
-function chatGPTUI(){
-  return `
-    <strong>ChatGPT (local)</strong>
-    <p class="hint">Aqui você pode digitar mensagens. Se enviar uma mensagem que começe com "abra" ou "abrir", eu tento executar comandos na ELISA.</p>
-    <div id="chatArea" style="height:140px;overflow:auto;border-radius:8px;padding:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);margin-top:8px"></div>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <input id="chatInput" placeholder="Digite um comando ou mensagem..." style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:#fff">
-      <button style="padding:8px 10px;border-radius:8px;background:#7b61ff;color:#fff" onclick="sendChat()">Enviar</button>
-    </div>
-  `;
-}
-
-function whatsappUI(){
-  return `
-    <strong>WhatsApp (demo)</strong>
-    <p class="hint">Lista de conversas e chat simples.</p>
-    <div style="display:flex;gap:12px;margin-top:8px">
-      <div style="width:34%;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px">
-        <div style="font-weight:700;margin-bottom:8px">Conversas</div>
-        <div style="opacity:.9">João</div>
-        <div style="opacity:.8;margin-top:6px">Maria</div>
-      </div>
-      <div style="flex:1;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px">
-        <div style="height:120px;overflow:auto" id="waChatArea"><div style="opacity:.9">João: Oi</div></div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <input id="waInput" placeholder="Mensagem..." style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff">
-          <button style="padding:8px 10px;border-radius:8px;background:#25D366;color:#111" onclick="sendWA()">Enviar</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function spotifyUI(){
-  return `
-    <strong>Spotify (demo)</strong>
-    <p class="hint">Player simples — play/pause (simulado).</p>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
-      <div style="width:84px;height:84px;background:linear-gradient(135deg,#1db954,#7bffb9);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#111;font-weight:700">SP</div>
-      <div style="flex:1">
-        <div style="font-weight:700">Música Demo</div>
-        <div class="hint">Artista — Álbum</div>
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button onclick="alert('Play (demo)')" style="padding:8px 10px;border-radius:8px;background:#1db954;border:none;color:#000">Play</button>
-          <button onclick="alert('Pause (demo)')" style="padding:8px 10px;border-radius:8px;background:#fff;border:none;color:#000">Pause</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function gamesUI(){
-  return `
-    <strong>Games</strong>
-    <p class="hint">Lista de jogos disponíveis (demo).</p>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
-      <button style="padding:8px 10px;border-radius:8px;background:#111;border:1px solid rgba(255,255,255,0.04);" onclick="alert('Abrir jogo — demo')">Jogo 1</button>
-      <button style="padding:8px 10px;border-radius:8px;background:#111;border:1px solid rgba(255,255,255,0.04);" onclick="alert('Abrir jogo — demo')">Jogo 2</button>
-    </div>
-  `;
-}
-
-function filesUI(){
-  return `
-    <strong>Gerenciador de Arquivos</strong>
-    <p class="hint">Explorar/baixar arquivos (demo).</p>
-    <div style="display:flex;gap:12px;margin-top:8px">
-      <div style="width:30%;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px">
-        <div style="font-weight:700;margin-bottom:8px">Pastas</div>
-        <div style="opacity:.9">Documentos</div>
-        <div style="opacity:.8;margin-top:6px">Downloads</div>
-      </div>
-      <div style="flex:1;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:700">Documentos</div>
-          <button style="padding:6px 8px;border-radius:8px;background:#7b61ff;color:#fff" onclick="alert('Upload (demo)')">Upload</button>
-        </div>
-        <div style="margin-top:8px">
-          <div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px">arquivo1.txt <button style="float:right" onclick="downloadSample()">Download</button></div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* ---------- SENDERS / INTERACTIONS ---------- */
-function sendChat(){
-  const input = document.getElementById('chatInput');
-  if(!input) return;
-  const txt = input.value.trim();
-  if(!txt) return;
-  const area = document.getElementById('chatArea');
-  if(area) area.innerHTML += `<div style="opacity:.95;margin-bottom:6px"><strong>Você:</strong> ${escapeHtml(txt)}</div>`;
-  input.value = '';
-  // se comando -> executar
-  executarComandoElisa(txt);
-  // resposta simulada
-  setTimeout(()=>{ if(area) area.innerHTML += `<div style="opacity:.85;margin-bottom:6px"><strong>ChatGPT:</strong> (resposta demo) — recebi: ${escapeHtml(txt)}</div>`; area.scrollTop = area.scrollHeight; },500);
-}
-
-function sendWA(){
-  const input = document.getElementById('waInput');
-  if(!input) return;
-  const txt = input.value.trim();
-  if(!txt) return;
-  const area = document.getElementById('waChatArea');
-  area.innerHTML += `<div style="opacity:.85;margin-top:6px"><strong>Você:</strong> ${escapeHtml(txt)}</div>`;
-  input.value = '';
-}
-
-/* ---------- DOWNLOAD / UTILS ---------- */
-function downloadText(){
-  const txt = document.getElementById('officeArea')?.value || '';
-  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+});
+qs('#downloadPdta').addEventListener('click', ()=>{
+  const content = pdtaEditor.value;
+  const blob = new Blob([content], {type:'application/json;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'documento.txt';
+  a.download = 'pdta.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+qs('#loadExamples').addEventListener('click', ()=>{
+  pdtaEditor.value = JSON.stringify({
+    "name":"PDTA - Modelo",
+    "description":"Exemplo gerado",
+    "steps":[
+      {"id":1,"name":"Iniciar","type":"start"},
+      {"id":2,"name":"Receber Input","type":"action"},
+      {"id":3,"name":"Executar Regras","type":"action"},
+      {"id":4,"name":"Responder","type":"end"}
+    ]
+  }, null, 2);
+  log('Exemplo PDTA carregado');
+});
+
+/* pre-load saved PDTA */
+if(localStorage.getItem('elisa_pdta')){
+  qs('#pdtaEditor').value = localStorage.getItem('elisa_pdta');
+  try{
+    const pj = JSON.parse(localStorage.getItem('elisa_pdta'));
+    qs('#pdtaSummary').textContent = `${pj.name || 'PDTA'} — ${pj.steps ? pj.steps.length + ' steps' : ''}`;
+  }catch(e){}
+}
+
+/* ===== Memória dinâmica (localStorage) ===== */
+function renderMemory(){
+  const container = qs('#memoryList');
+  container.innerHTML = '';
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('elisa_mem_'));
+  if(keys.length===0){ container.innerHTML = '<div class="muted">Nenhuma entrada</div>'; qs('#memCount').textContent = '0 entradas'; return; }
+  keys.forEach(k=>{
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    const keyLabel = k.replace('elisa_mem_','');
+    const val = localStorage.getItem(k);
+    item.innerHTML = `<div style="flex:1"><strong>${keyLabel}</strong><div class="muted" style="font-size:13px;max-width:220px;overflow:hidden;text-overflow:ellipsis">${val}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="ghost" onclick="copyMem('${keyLabel}')">Copiar</button>
+        <button class="ghost" onclick="delMem('${keyLabel}')">Deletar</button>
+        <button class="ghost" onclick="editMem('${keyLabel}')">Editar</button>
+      </div>`;
+    container.appendChild(item);
+  });
+  qs('#memCount').textContent = keys.length + ' entradas';
+}
+window.copyMem = (k) => {
+  const v = localStorage.getItem('elisa_mem_'+k);
+  navigator.clipboard?.writeText(v).then(()=> log('Memória copiada: '+k));
+}
+window.delMem = (k) => {
+  if(!confirm('Deletar '+k+'?')) return;
+  localStorage.removeItem('elisa_mem_'+k);
+  renderMemory();
+  log('Memória removida: '+k);
+}
+window.editMem = (k) => {
+  qs('#memKey').value = k;
+  qs('#memValue').value = localStorage.getItem('elisa_mem_'+k) || '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+qs('#addMem').addEventListener('click', ()=>{
+  const k = qs('#memKey').value.trim();
+  const v = qs('#memValue').value;
+  if(!k){ alert('Informe uma chave'); return; }
+  localStorage.setItem('elisa_mem_'+k, v);
+  renderMemory();
+  log('Memória adicionada: '+k);
+  qs('#memKey').value=''; qs('#memValue').value='';
+});
+qs('#updateMem').addEventListener('click', ()=>{
+  const k = qs('#memKey').value.trim();
+  const v = qs('#memValue').value;
+  if(!k){ alert('Informe uma chave'); return; }
+  localStorage.setItem('elisa_mem_'+k, v);
+  renderMemory();
+  log('Memória atualizada: '+k);
+});
+qs('#exportMemory').addEventListener('click', ()=>{
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('elisa_mem_'));
+  const obj = {};
+  keys.forEach(k=> obj[k.replace('elisa_mem_','')] = localStorage.getItem(k));
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='elisa_memory.json'; a.click(); URL.revokeObjectURL(a.href);
+});
+qs('#importMemory').addEventListener('click', ()=>{
+  const input = document.createElement('input'); input.type='file'; input.accept='application/json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try{
+        const obj = JSON.parse(ev.target.result);
+        Object.keys(obj).forEach(k => localStorage.setItem('elisa_mem_'+k, obj[k]));
+        renderMemory(); log('Memória importada');
+        alert('Memória importada com sucesso');
+      }catch(er){ alert('JSON inválido: '+er.message) }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+});
+qs('#clearMemoryBtn').addEventListener('click', ()=>{
+  if(!confirm('Limpar toda a memória local?')) return;
+  Object.keys(localStorage).filter(k=>k.startsWith('elisa_mem_')).forEach(k=>localStorage.removeItem(k));
+  renderMemory(); log('Memória limpa');
+});
+qs('#clearMemory').addEventListener('click', ()=> qs('#clearMemoryBtn').click());
+
+renderMemory();
+
+/* ===== Files (client-side) ===== */
+let filesStore = []; // {name, blob}
+qs('#btnUpload').addEventListener('click', ()=> qs('#fileUploader').click());
+qs('#fileUploader').addEventListener('change', (e)=>{
+  const list = Array.from(e.target.files);
+  list.forEach(f=>{
+    filesStore.push({name:f.name, blob:f});
+  });
+  renderFiles();
+  log(list.length + ' arquivo(s) carregado(s) localmente');
+});
+function renderFiles(){
+  const area = qs('#fileListArea');
+  area.innerHTML = '';
+  if(filesStore.length===0){ area.innerHTML = '<div class="muted">Nenhum arquivo carregado.</div>'; qs('#filesCount').textContent = '0'; return; }
+  filesStore.forEach((f,idx)=>{
+    const el = document.createElement('div');
+    el.className = 'file-item';
+    el.innerHTML = `<div style="flex:1"><strong>${f.name}</strong><div class="muted" style="font-size:13px">Tamanho: ${f.blob.size} bytes</div></div>
+      <div style="display:flex;gap:6px">
+        <button onclick="downloadFile(${idx})">Baixar</button>
+        <button onclick="removeFile(${idx})" style="color:var(--danger)">Remover</button>
+      </div>`;
+    area.appendChild(el);
+  });
+  qs('#filesCount').textContent = filesStore.length;
+}
+window.downloadFile = (idx) => {
+  const f = filesStore[idx];
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(f.blob);
+  a.download = f.name;
   a.click();
   URL.revokeObjectURL(a.href);
 }
+window.removeFile = (idx) => {
+  filesStore.splice(idx,1);
+  renderFiles();
+  log('Arquivo removido localmente');
+}
+qs('#btnDownloadZip').addEventListener('click', async ()=>{
+  if(filesStore.length===0){ alert('Nenhum arquivo para zipar'); return; }
+  // Cria zip simples usando JSZip? Não disponível aqui — faremos download individualmente ou enviar para backend.
+  if(!confirm('Baixar todos os arquivos individualmente? Para zip no cliente, instale JSZip no servidor.')) return;
+  filesStore.forEach((f)=> {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(f.blob);
+    a.download = f.name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+});
 
-function downloadSample(){
-  const data = 'Conteúdo de exemplo do arquivo.';
-  const blob = new Blob([data], {type:'text/plain'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'arquivo1.txt';
-  a.click();
-  URL.revokeObjectURL(a.href);
+/* ===== Chat - comunica com backend ===== */
+function getApiUrl(path){
+  if(API.base && API.base.trim()!=='') return API.base.replace(/\/$/,'') + path;
+  return path;
 }
 
-function escapeHtml(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+qs('#sendChat').addEventListener('click', sendChatMessage);
+qs('#chatInput').addEventListener('keydown', (e)=> { if(e.key==='Enter') sendChatMessage(); });
 
-/* ---------- EXECUTAR COMANDO (integração ChatGPT) ---------- */
-function executarComandoElisa(comando){
-  if(!comando) return;
-  comando = comando.toLowerCase();
-  // abrir apps
-  if(comando.includes('abrir office')||comando.includes('abrir documento')||comando.includes('criar documento')) openAppSingle('office');
-  else if(comando.includes('abrir teams')) openAppSingle('teams');
-  else if(comando.includes('abrir spotify')||comando.includes('tocar música')) openAppSingle('spotify');
-  else if(comando.includes('abrir youtube')) openAppSingle('youtube');
-  else if(comando.includes('abrir whatsapp')) openAppSingle('whatsapp');
-  else if(comando.includes('abrir netflix')) openAppSingle('netflix');
-  else if(comando.includes('abrir prime')) openAppSingle('prime');
-  else if(comando.includes('abrir jogos')||comando.includes('abrir games')) openAppSingle('games');
-  else if(comando.includes('abrir arquivos')||comando.includes('abrir pendrive')) openAppSingle('files');
-  else {
-    // comando não reconhecido — deixar como mensagem no chat se existir
-    const area = document.getElementById('chatArea');
-    if(area) area.innerHTML += `<div style="opacity:.8;margin-top:6px"><em>Comando não reconhecido: ${escapeHtml(comando)}</em></div>`;
+async function sendChatMessage(){
+  const txt = qs('#chatInput').value.trim();
+  if(!txt) return;
+  appendChat('me', txt);
+  qs('#chatInput').value = '';
+  try{
+    const url = getApiUrl(API.endpoints.elisa);
+    const res = await fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message: txt})
+    });
+    if(!res.ok) throw new Error('Resposta inválida: '+res.status);
+    const data = await res.json();
+    const answer = data.answer || data.response || JSON.stringify(data);
+    appendChat('elisa', answer);
+    log('Mensagem enviada e resposta recebida');
+  }catch(err){
+    appendChat('elisa', 'Erro na comunicação: ' + err.message);
+    log('Erro: ' + err.message);
   }
 }
 
-/* ---------- LOGIN / PRELOAD ---------- */
-function login(){
-  const u = $('#username').value.trim();
-  const p = $('#password').value.trim();
-  if(!u || !p){ alert('Digite usuário e senha.'); return; }
-  $('#login-screen').style.display = 'none';
-  $('#desktop').style.display = 'flex';
-  preloadApps();
+function appendChat(who, text){
+  const c = qs('#chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (who==='me' ? 'me' : 'elisa');
+  div.textContent = text;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
 }
 
-function preloadApps(){
-  APPS.forEach(a => openApps[a.id] = null);
-}
+/* ===== Start / Stop server (via API) ===== */
+qs('#btnStart').addEventListener('click', async ()=>{
+  try{
+    const url = getApiUrl(API.endpoints.start);
+    const res = await fetch(url, {method:'POST'});
+    if(res.ok){ setStatus('Rodando', 'var(--success)'); log('Start solicitado'); alert('Start solicitado ao servidor'); } else { throw new Error(res.statusText || res.status); }
+  }catch(e){ setStatus('Erro', 'var(--danger)'); log('Erro start: '+e.message); alert('Erro ao pedir start: '+e.message); }
+});
+qs('#btnStop').addEventListener('click', async ()=>{
+  try{
+    const url = getApiUrl(API.endpoints.stop);
+    const res = await fetch(url, {method:'POST'});
+    if(res.ok){ setStatus('Parado', '#ffb86b'); log('Stop solicitado'); alert('Stop solicitado ao servidor'); } else { throw new Error(res.statusText || res.status); }
+  }catch(e){ setStatus('Erro', 'var(--danger)'); log('Erro stop: '+e.message); alert('Erro ao pedir stop: '+e.message); }
+});
 
-/* ---------- MONITOR SIMULADO ---------- */
-setInterval(()=>{
-  const used = Object.values(openApps).filter(x=>x).length;
-  const badge = $('#statusBadge');
-  if(used >= Math.max(8, maxOpenApps-2)){ badge.style.display='inline-block'; badge.textContent='Alta'; }
-  else if(used>0){ badge.style.display='inline-block'; badge.textContent='OK'; }
-  else badge.style.display='none';
-},1500);
+/* ===== Settings ===== */
+qs('#apiBase').value = API.base;
+qs('#saveSettings').addEventListener('click', ()=>{
+  const v = qs('#apiBase').value.trim();
+  API.base = v;
+  localStorage.setItem('elisa_api_base', v);
+  log('Configurações salvas: API base = ' + (v||'(relativo)'));
+  alert('Configurações salvas');
+});
+qs('#resetSettings').addEventListener('click', ()=>{
+  if(!confirm('Resetar configurações?')) return;
+  API.base = DEFAULT_API_BASE;
+  localStorage.removeItem('elisa_api_base');
+  qs('#apiBase').value = API.base;
+  log('Configurações resetadas');
+});
 
-/* ---------- AUTH / UI HOOKS ---------- */
-$('#btnLogin').addEventListener('click', login);
-$('#btnLogout').addEventListener('click', ()=> { location.reload(); });
+/* ===== Quick actions ===== */
+qs('#editPDTA').addEventListener('click', ()=> qsa('.menu button').forEach(b=> { if(b.dataset.view==='pdta'){ b.click(); window.scrollTo({top:0,behavior:'smooth'}) }}));
+qs('#openMemory').addEventListener('click', ()=> qsa('.menu button').forEach(b=> { if(b.dataset.view==='memory') b.click(); }));
+qs('#openLog').addEventListener('click', ()=> { alert(qs('#logArea').innerText || 'Sem logs'); });
 
-/* ---------- PRE-OPEN: welcome window ---------- */
-function openWelcome(){
-  setTimeout(()=> openWindow('Boas-vindas', '<strong>Bem-vindo à ELISA Ultra</strong><p class="hint">Abra apps pelo menu.</p>'), 600);
-}
+qs('#clearLogs').addEventListener('click', ()=> { qs('#logArea').innerHTML = 'Sem logs.'; log('Logs limpos'); });
 
-/* ---------- GENERIC OPEN WINDOW (non-app) ---------- */
-function openWindow(title, html){
-  // similar to openAppSingle but no mapping to openApps
-  winCount++;
-  const win = create('div',{class:'win'});
-  win.style.top = (30 + 18*winCount) + 'px';
-  win.style.left = (30 + 18*winCount) + 'px';
-  win.style.zIndex = ++zBase;
-  const head = create('div',{class:'head'});
-  const t = create('div',{class:'title', text: title});
-  const ctrls = create('div',{class:'controls'});
-  const btnMin = create('button',{class:'ctrl-btn', text:'—'});
-  const btnClose = create('button',{class:'ctrl-btn', text:'✕'});
-  ctrls.appendChild(btnMin); ctrls.appendChild(btnClose);
-  head.appendChild(t); head.appendChild(ctrls);
-  const body = create('div',{class:'body', html: html});
-  win.appendChild(head); win.appendChild(body);
-  windowsArea.appendChild(win);
-  btnClose.onclick = ()=> win.remove();
-  btnMin.onclick = ()=> { if(body.style.display==='none'){ body.style.display='block'; win.style.height='auto'; } else { body.style.display='none'; win.style.height='44px'; } };
-  makeDraggable(win, head);
-}
+/* ===== Backup local PDTA button ===== */
+qs('#backupBtn').addEventListener('click', ()=>{
+  const p = localStorage.getItem('elisa_pdta');
+  if(!p){ alert('Nenhum PDTA salvo localmente. Salve no Editor primeiro.'); return; }
+  const a = document.createElement('a');
+  const blob = new Blob([p], {type:'application/json'});
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pdta-backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  log('Backup PDTA feito');
+});
 
-/* ---------- INITIAL FLOW ---------- */
-openWelcome();
+/* ===== Theme buttons ===== */
+qs('#themePS').addEventListener('click', ()=>{
+  document.body.style.background = 'radial-gradient(1200px 600px at 10% 10%, rgba(111,91,255,0.04), transparent), linear-gradient(180deg, #061021 0%, #05101a 45%, #031017 100%)';
+  log('Tema PS4 aplicado');
+});
+qs('#themeDark').addEventListener('click', ()=>{
+  document.body.style.background = 'linear-gradient(180deg,#021018,#031018)';
+  log('Tema Dark aplicado');
+});
 
-/* ---------- UTIL: openWindowApp wrapper for direct open (exposed) ---------- */
-function openWindowApp(name){ openWindow(name, `<div class="hint">Janela: ${escapeHtml(name)} (demo)</div>`); }
-
-/* ---------- compatibility: expose for console debug ---------- */
-window.openAppSingle = openAppSingle;
-window.executarComandoElisa = executarComandoElisa;
-
-/* ---------- disable accidental text selection while dragging ---------- */
-document.addEventListener('dragstart', e => e.preventDefault());
-
+/* ===== Inicialização ===== */
+(function init(){
+  setStatus(API.base ? 'Configurado (API externa)' : 'Relativo (sem API base)', API.base ? 'lightgreen' : 'orange');
+  renderFiles();
+  log('UI inicializado');
+})();
 </script>
 </body>
 </html>
