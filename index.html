@@ -1,32 +1,354 @@
-Running Elisaiachat.html remotely..
-
-/box/script.js:1
 <!DOCTYPE html>
-^
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Elisa OS - Windows 11 Estilo</title>
+<style>
+/* ------------------------------------ */
+/* CSS: Estética Windows 11 Full */
+/* ------------------------------------ */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: "Segoe UI", Arial, sans-serif;
+    overflow: hidden;
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    transition: background 1s;
+    user-select: none; /* Estética de OS */
+}
 
-SyntaxError: Unexpected token '<'
-    at Module._compile (internal/modules/cjs/loader.js:895:18)
-    at Object.Module._extensions..js (internal/modules/cjs/loader.js:995:10)
-    at Module.load (internal/modules/cjs/loader.js:815:32)
-    at Function.Module._load (internal/modules/cjs/loader.js:727:14)
-    at Function.Module.runMain (internal/modules/cjs/loader.js:1047:10)
-    at internal/main/run_main_module.js:17:11
+#desktop {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Ícones de apps */
+.app-icon {
+    width: 80px;
+    text-align: center;
+    margin: 20px;
+    color: white;
+    cursor: pointer;
+    display: inline-block;
+    transition: transform 0.2s;
+}
+.app-icon:hover { transform: scale(1.1); }
+.app-icon img { width: 60px; height: 60px; border-radius: 12px; }
+
+/* Barra de tarefas (Onde o Kernel aplica a cor) */
+#taskbar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    background: rgba(30,30,30,0.85); /* Será sobrescrito pelo KERNEL */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centraliza no estilo Windows 11 */
+    padding: 0 10px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px); /* Tenta aplicar o Efeito Mica */
+    -webkit-backdrop-filter: blur(10px); 
+    transition: background 0.5s;
+}
+
+/* Centro da barra de tarefas */
+#taskbar-center {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Botão iniciar */
+#start-button {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+}
+#start-button:hover { background: rgba(255,255,255,0.2); }
+
+/* Relógio */
+#clock { 
+    position: absolute;
+    right: 15px;
+    color: white; 
+    font-size: 12px; 
+    text-align: right;
+    line-height: 1.2;
+}
+
+/* Menu iniciar */
+#start-menu {
+    position: absolute;
+    bottom: 60px;
+    /* Centraliza o menu no centro da barra */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    max-height: 400px;
+    background: rgba(40,40,40,0.95); /* Será sobrescrito pelo KERNEL */
+    border-radius: 12px;
+    padding: 20px;
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    backdrop-filter: blur(15px); /* Tenta aplicar o Efeito Acrílico */
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    transition: background 0.5s;
+}
+
+/* Itens do menu */
+.start-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    color: white;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.start-menu-item:hover { background: rgba(255,255,255,0.15); }
+
+/* Container de apps */
+#app-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 50px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Iframe apps */
+iframe {
+    width: 90%;
+    height: 90%;
+    border-radius: 12px;
+    border: none;
+    background: #000;
+}
+
+/* Animação de abertura de apps */
+@keyframes openApp {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.opening { animation: openApp 0.3s ease; }
+</style>
+</head>
+<body>
+<div id="desktop">
+    <div id="desktop-icons">
+        <div class="app-icon" data-app="elisa-browser">
+            <img src="https://img.icons8.com/color/96/000000/google-chrome.png"/>
+            <div>Navegador Elisa</div>
+        </div>
+        <div class="app-icon" data-app="explorer">
+            <img src="https://img.icons8.com/color/96/000000/folder-invoices.png"/>
+            <div>Explorador</div>
+        </div>
+        <div class="app-icon" data-app="netflix">
+            <img src="https://img.icons8.com/color/96/000000/netflix.png"/>
+            <div>Entretenimento</div>
+        </div>
+        <div class="app-icon" data-app="word">
+            <img src="https://img.icons8.com/color/96/000000/ms-word.png"/>
+            <div>WordPad</div>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <p style="color:white; text-align:center;">
+            Elisa OS 11.0: Sistema em Execução.<br>
+            Aguardando a inicialização da interface...
+        </p>
+    </div>
+
+    <div id="taskbar">
+        <div id="taskbar-center">
+            <div id="start-button">💻</div>
+            </div>
+        <div id="clock"></div>
+    </div>
+
+    <div id="start-menu">
+        <div style="font-size: 18px; color: #4e54c8; margin-bottom: 10px;">Aplicativos Sugeridos</div>
+        <div class="start-menu-item" data-app="elisa-browser">
+            <img src="https://img.icons8.com/color/48/000000/google-chrome.png" width="32" height="32"/> Navegador Elisa
+        </div>
+        <div class="start-menu-item" data-app="explorer">
+            <img src="https://img.icons8.com/color/48/000000/folder-invoices.png" width="32" height="32"/> Explorador de Arquivos
+        </div>
+        <div class="start-menu-item" data-app="netflix">
+            <img src="https://img.icons8.com/color/48/000000/netflix.png" width="32" height="32"/> Netflix
+        </div>
+        <div class="start-menu-item" data-app="word">
+            <img src="https://img.icons8.com/color/48/000000/ms-word.png" width="32" height="32"/> Editor de Texto
+        </div>
+        <div class="start-menu-item" data-app="excel">
+            <img src="https://img.icons8.com/color/48/000000/ms-excel.png" width="32" height="32"/> Planilha
+        </div>
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 15px; padding-top: 10px;">
+            <div class="start-menu-item" data-app="shutdown">
+                <img src="https://img.icons8.com/color/48/000000/shutdown.png" width="32" height="32"/> Desligar (Simulado)
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// =================================================================
+// ESTRUTURA MODULAR ÚNICA (Simulando KERNEL e APP SHELL)
+// =================================================================
+
+document.addEventListener("DOMContentLoaded", function(){
+    
+    // --- KERNEL: Módulo de Drivers/IA (Roda primeiro para correção de falhas) ---
+
+    const driverDB = {
+        "Chrome_Alta_Mica": ["rgb(35, 35, 35, 0.8)"], 
+        "Firefox_Básica_Mica": ["rgb(30, 30, 30, 0.9)"],
+        "Fallback_Baixa_NoMica": ["#1a1a1a"], // Código de reparo (Fallback para cor sólida)
+    };
+
+    function pesquisarDriverIA() {
+        const isBackdropSupported = CSS.supports('backdrop-filter', 'blur(10px)');
+        const cpuCores = navigator.hardwareConcurrency || 4;
+        const browser = navigator.userAgent.includes("Chrome") ? "Chrome" : 
+                        navigator.userAgent.includes("Firefox") ? "Firefox" : "Fallback";
+        
+        const performanceLevel = cpuCores >= 8 ? "Alta" : "Baixa";
+        const micaStatus = isBackdropSupported ? "Mica" : "NoMica";
+
+        const pesquisaChave = `${browser}_${performanceLevel}_${micaStatus}`;
+        const configuracao = driverDB[pesquisaChave] || driverDB["Fallback_Baixa_NoMica"];
+        
+        console.log(`[KERNEL - DRIVER DE VÍDEO]: Detectada chave: ${pesquisaChave}`);
+        
+        return { taskbarColor: configuracao[0] };
+    }
+    
+    // Aplicação Imediata da Correção (Evita a "Tela Torta")
+    const kernelSettings = pesquisarDriverIA();
+    const taskbar = document.getElementById('taskbar');
+    const startMenu = document.getElementById('start-menu');
+    
+    if (taskbar) taskbar.style.background = kernelSettings.taskbarColor; 
+    if (startMenu) startMenu.style.background = kernelSettings.taskbarColor.replace('rgb', 'rgba').replace(')', ', 0.95)');
+    
+    // --- APP SHELL: Módulo de Interface (Carregamento Serializado com Pausas) ---
+    
+    const startButton = document.getElementById("start-button");
+    const appContainer = document.getElementById("app-container");
+    const clickSound = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
+
+    // 1. Atraso 0ms: Mínimo (Botão Iniciar)
+    startButton.addEventListener("click", () => {
+        startMenu.style.display = startMenu.style.display === "flex" ? "none" : "flex";
+    });
+
+    // 2. Atraso 500ms: Relógio (Componente Essencial de UI)
+    setTimeout(() => {
+        function updateClock() {
+            const clock = document.getElementById("clock");
+            const now = new Date();
+            const time = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const date = now.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'});
+            clock.innerHTML = `<div>${time}</div><div style="font-size:10px;">${date}</div>`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+        console.log("[APP SHELL]: Relógio e Data iniciados.");
+    }, 500); 
+
+    // 3. Atraso 1500ms: Drivers de Interação e Listeners (Finalização da Inicialização)
+    setTimeout(() => {
+        
+        document.querySelectorAll(".app-icon, .start-menu-item, #start-button").forEach(el=>{
+            // Ativa o Driver de Som
+            el.addEventListener("click", ()=> clickSound.play());
+
+            // Ativa o Carregamento Sob Demanda
+            el.addEventListener("click", ()=>{
+                const app = el.getAttribute("data-app");
+                if(app && app !== "shutdown") {
+                    loadApp(app);
+                } else if (app === "shutdown") {
+                    alert("Elisa OS desligado. Adeus!");
+                    // Simulação de encerramento. Na web, apenas limpa a tela.
+                    document.body.innerHTML = '<div style="background:#000; color:white; width:100%; height:100%; display:flex; justify-content:center; align-items:center; font-size: 24px;">Elisa OS Desligado.</div>';
+                }
+                startMenu.style.display = "none";
+            });
+        });
+
+        // Limpa a mensagem inicial
+        appContainer.innerHTML = '<p style="color:white; text-align:center;">Clique em um ícone ou no menu iniciar para abrir um aplicativo.</p>';
+        
+        console.log("[APP SHELL]: Inicialização completa. Sistema pronto para uso.");
+    }, 1500);
 
 
-Program finished in 0.034s with 6900.0KB of memory.Execution completed in 1.357s
-Error: Running Elisaiachat.html remotely..
-
-/box/script.js:1
-<!DOCTYPE html>
-^
-
-SyntaxError: Unexpected token '<'
-    at Module._compile (internal/modules/cjs/loader.js:895:18)
-    at Object.Module._extensions..js (internal/modules/cjs/loader.js:995:10)
-    at Module.load (internal/modules/cjs/loader.js:815:32)
-    at Function.Module._load (internal/modules/cjs/loader.js:727:14)
-    at Function.Module.runMain (internal/modules/cjs/loader.js:1047:10)
-    at internal/main/run_main_module.js:17:11
-
-
-Program finished in 0.034s with 6900.0KB of memory.
+    // --- Função loadApp (Aplicativos Isolados - Módulo Sob Demanda) ---
+    function loadApp(app){
+        appContainer.innerHTML = "";
+        let iframe;
+        
+        switch(app){
+            case "elisa-browser":
+                iframe = document.createElement("iframe");
+                iframe.src = "https://html.duckduckgo.com/html/"; // Navegador simples e seguro
+                break;
+            case "netflix":
+                iframe = document.createElement("iframe");
+                iframe.src = "https://www.netflix.com"; 
+                break;
+            case "word":
+                iframe = document.createElement("iframe");
+                iframe.src = "https://docs.google.com/document/u/0/?tgif=d"; 
+                break;
+            case "excel":
+                iframe = document.createElement("iframe");
+                iframe.src = "https://docs.google.com/spreadsheets/u/0/?tgif=d"; 
+                break;
+            case "explorer":
+                // Simulação de Explorador (Ponte para o Python)
+                appContainer.innerHTML = `<div style="color:#4CAF50; font-size:1.2em; text-align:center; padding-top: 100px;">
+                                            📁 Explorador de Arquivos:<br>
+                                            Conectando ao servidor...<br>
+                                            (Aguardando o módulo Python)
+                                          </div>`;
+                return;
+            default:
+                appContainer.innerHTML = `<p style="color:red; text-align:center;">Aplicativo não disponível ou em manutenção.</p>`;
+                return;
+        }
+        
+        iframe.classList.add("opening");
+        iframe.style.width = '90%';
+        iframe.style.height = '90%';
+        iframe.style.border = 'none';
+        iframe.style.borderRadius = '12px';
+        appContainer.appendChild(iframe);
+    }
+});
+</script>
+</body>
+</html>
