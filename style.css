@@ -1,60 +1,250 @@
-body {
+/* -------------------- */
+/*     WINDOWS 11 UI    */
+/* -------------------- */
+
+* {
     margin: 0;
     padding: 0;
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #1f1f1f, #0a0a0a);
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    overflow: hidden;
+}
+
+/* PAPEL DE PAREDE */
+.wallpaper {
+    position: fixed;
+    inset: 0;
+    background: url("https://wallpaperaccess.com/full/5717731.jpg") no-repeat center center / cover;
+    filter: blur(0px);
+    z-index: -1;
+}
+
+/* -------------------- */
+/*     TASKBAR (W11)    */
+/* -------------------- */
+
+.taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 55px;
+    background: rgba(40, 40, 40, 0.45);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 9000;
+}
+
+.task-icons {
+    display: flex;
+    gap: 20px;
+}
+
+.task-icon {
+    width: 42px;
+    height: 42px;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
     color: white;
+    font-size: 18px;
 }
 
-.container {
+.task-icon:hover {
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.1);
+}
+
+.task-clock {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* -------------------- */
+/*     MENU INICIAR     */
+/* -------------------- */
+
+#start-menu {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    width: 420px;
+    height: 520px;
+    background: rgba(255,255,255,0.80);
+    backdrop-filter: blur(30px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    padding: 25px;
+    opacity: 0;
+    display: none;
+    flex-direction: column;
+    transition: 0.2s;
+    z-index: 8999;
+}
+
+#start-menu.start-open {
+    opacity: 1;
+    display: flex;
+    transform: translateX(-50%) scale(1);
+}
+
+#start-menu h2 {
     text-align: center;
-    margin-top: 50px;
+    margin-bottom: 15px;
+    color: #222;
 }
 
-.titulo {
-    font-size: 40px;
-    color: #58a6ff;
-}
-
-.sub {
-    font-size: 20px;
-    opacity: 0.7;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
+.start-apps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
     margin-top: 20px;
 }
 
-li {
-    background: #222;
-    padding: 15px;
-    margin: 10px auto;
-    width: 250px;
-    border-radius: 10px;
+.app {
+    text-align: center;
     cursor: pointer;
     transition: 0.2s;
 }
 
-li:hover {
-    background: #333;
-    transform: scale(1.05);
+.app i {
+    background: rgba(0,0,0,0.1);
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #333;
+    margin: 0 auto 5px;
 }
 
-button {
-    background: #0055ff;
+.app:hover {
+    transform: translateY(-5px);
+    opacity: 0.8;
+}
+
+/* -------------------- */
+/*       JANELAS        */
+/* -------------------- */
+
+.window {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 550px;
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(25px);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 30px 50px rgba(0,0,0,0.4);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+    z-index: 7000;
+}
+
+.window-titlebar {
+    height: 42px;
+    background: rgba(255,255,255,0.55);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+
+.window-titlebar span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+}
+
+.window-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.window-buttons button {
+    width: 28px;
+    height: 28px;
     border: none;
-    padding: 12px 25px;
-    margin: 10px;
-    border-radius: 8px;
-    font-size: 16px;
-    color: white;
     cursor: pointer;
+    border-radius: 4px;
+    background: transparent;
+    font-size: 18px;
+    color: #333;
     transition: 0.2s;
 }
 
-button:hover {
-    background: #3a78ff;
-    transform: scale(1.05);
+.window-buttons button:hover {
+    background: rgba(0,0,0,0.1);
+}
+
+/* --------------------------- */
+/*      CONTEÚDO DA JANELA     */
+/* --------------------------- */
+
+.window-content {
+    padding: 25px;
+    height: calc(100% - 42px);
+    overflow-y: auto;
+}
+
+.window-content h2 {
+    margin-bottom: 20px;
+}
+
+.sys-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.sys-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.sys-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.sys-card i {
+    font-size: 40px;
+    color: #2563eb;
+    margin-bottom: 10px;
+}
+
+.sys-card p {
+    font-size: 15px;
+    color: #444;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-50%) scale(0.97); }
+    to { opacity: 1; transform: translateX(-50%) scale(1); }
 }
