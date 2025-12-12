@@ -1,31 +1,87 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Windows 11</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema Windows 11 - Painel Empresarial</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-<div id="win11-window">
-    <div class="titlebar">
-        <span class="title">Painel do Sistema</span>
-        <div class="buttons">
+<!-- PAPEL DE PAREDE -->
+<div class="wallpaper"></div>
+
+<!-- BARRA DE TAREFAS -->
+<div class="taskbar">
+    <div class="task-icons">
+        <div class="task-icon" id="start-btn">
+            <i class="fa-solid fa-windows"></i>
+        </div>
+        <div class="task-icon"><i class="fa-solid fa-folder"></i></div>
+        <div class="task-icon"><i class="fa-solid fa-gear"></i></div>
+    </div>
+
+    <div class="task-clock">
+        <span id="task-time"></span>
+    </div>
+</div>
+
+<!-- MENU INICIAR -->
+<div id="start-menu" class="start-hidden">
+    <h2>Menu Iniciar</h2>
+    <div class="start-apps">
+        <div class="app"><i class="fa-solid fa-gear"></i><p>Configurações</p></div>
+        <div class="app"><i class="fa-solid fa-folder"></i><p>Explorador</p></div>
+        <div class="app"><i class="fa-solid fa-globe"></i><p>Navegador</p></div>
+        <div class="app"><i class="fa-solid fa-microchip"></i><p>Sistema</p></div>
+    </div>
+</div>
+
+<!-- JANELA PAINEL DO SISTEMA -->
+<div id="system-window" class="window">
+    <div class="window-titlebar">
+        <span>Painel do Sistema</span>
+        <div class="window-buttons">
             <button class="min">—</button>
             <button class="max">□</button>
             <button class="close">×</button>
         </div>
     </div>
 
-    <div class="content">
-        <h2>Sistema</h2>
-        <div class="cards">
-            <div class="card">Processador</div>
-            <div class="card">Armazenamento</div>
-            <div class="card">Rede</div>
-            <div class="card">Aplicativos</div>
-            <div class="card">Explorador</div>
+    <div class="window-content">
+        <h2>Informações do Sistema</h2>
+
+        <div class="sys-grid">
+            <div class="sys-card">
+                <i class="fa-solid fa-microchip"></i>
+                <p>Processador</p>
+            </div>
+
+            <div class="sys-card">
+                <i class="fa-solid fa-memory"></i>
+                <p>Memória RAM</p>
+            </div>
+
+            <div class="sys-card">
+                <i class="fa-solid fa-hard-drive"></i>
+                <p>Armazenamento</p>
+            </div>
+
+            <div class="sys-card">
+                <i class="fa-solid fa-wifi"></i>
+                <p>Rede</p>
+            </div>
+
+            <div class="sys-card">
+                <i class="fa-solid fa-folder-open"></i>
+                <p>Arquivos</p>
+            </div>
+
+            <div class="sys-card">
+                <i class="fa-solid fa-robot"></i>
+                <p>IA & Automação</p>
+            </div>
         </div>
     </div>
 </div>
