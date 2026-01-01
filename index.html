@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sistema Windows 11 - Painel Empresarial</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema Windows 11 - Nuvem</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
@@ -14,76 +14,83 @@
 
 <!-- BARRA DE TAREFAS -->
 <div class="taskbar">
-    <div class="task-icons">
-        <div class="task-icon" id="start-btn">
-            <i class="fa-solid fa-windows"></i>
-        </div>
-        <div class="task-icon"><i class="fa-solid fa-folder"></i></div>
-        <div class="task-icon"><i class="fa-solid fa-gear"></i></div>
+  <div class="task-icons">
+    <div class="task-icon" id="start-btn">
+      <i class="fa-brands fa-windows"></i>
     </div>
-
-    <div class="task-clock">
-        <span id="task-time"></span>
-    </div>
+  </div>
+  <div class="task-clock">
+    <span id="task-time"></span>
+  </div>
 </div>
 
 <!-- MENU INICIAR -->
 <div id="start-menu" class="start-hidden">
-    <h2>Menu Iniciar</h2>
-    <div class="start-apps">
-        <div class="app"><i class="fa-solid fa-gear"></i><p>Configurações</p></div>
-        <div class="app"><i class="fa-solid fa-folder"></i><p>Explorador</p></div>
-        <div class="app"><i class="fa-solid fa-globe"></i><p>Navegador</p></div>
-        <div class="app"><i class="fa-solid fa-microchip"></i><p>Sistema</p></div>
-    </div>
+  <h2>Menu Iniciar</h2>
+  <div class="start-apps">
+    <div class="app" data-window="explorer-window"><i class="fa-solid fa-folder"></i><p>Explorador</p></div>
+    <div class="app" data-window="notepad-window"><i class="fa-solid fa-file-lines"></i><p>Bloco de Notas</p></div>
+    <div class="app" data-window="browser-window"><i class="fa-solid fa-globe"></i><p>Navegador</p></div>
+    <div class="app" data-window="system-window"><i class="fa-solid fa-gear"></i><p>Configurações</p></div>
+  </div>
 </div>
 
-<!-- JANELA PAINEL DO SISTEMA -->
-<div id="system-window" class="window">
-    <div class="window-titlebar">
-        <span>Painel do Sistema</span>
-        <div class="window-buttons">
-            <button class="min">—</button>
-            <button class="max">□</button>
-            <button class="close">×</button>
-        </div>
+<!-- JANELAS -->
+<div id="explorer-window" class="window hidden">
+  <div class="window-titlebar">
+    <span>Explorador de Arquivos</span>
+    <div class="window-buttons">
+      <button class="min">—</button>
+      <button class="max">□</button>
+      <button class="close">×</button>
     </div>
+  </div>
+  <div class="window-content">
+    <p>Pastas e arquivos simulados...</p>
+  </div>
+</div>
 
-    <div class="window-content">
-        <h2>Informações do Sistema</h2>
-
-        <div class="sys-grid">
-            <div class="sys-card">
-                <i class="fa-solid fa-microchip"></i>
-                <p>Processador</p>
-            </div>
-
-            <div class="sys-card">
-                <i class="fa-solid fa-memory"></i>
-                <p>Memória RAM</p>
-            </div>
-
-            <div class="sys-card">
-                <i class="fa-solid fa-hard-drive"></i>
-                <p>Armazenamento</p>
-            </div>
-
-            <div class="sys-card">
-                <i class="fa-solid fa-wifi"></i>
-                <p>Rede</p>
-            </div>
-
-            <div class="sys-card">
-                <i class="fa-solid fa-folder-open"></i>
-                <p>Arquivos</p>
-            </div>
-
-            <div class="sys-card">
-                <i class="fa-solid fa-robot"></i>
-                <p>IA & Automação</p>
-            </div>
-        </div>
+<div id="notepad-window" class="window hidden">
+  <div class="window-titlebar">
+    <span>Bloco de Notas</span>
+    <div class="window-buttons">
+      <button class="min">—</button>
+      <button class="max">□</button>
+      <button class="close">×</button>
     </div>
+  </div>
+  <div class="window-content">
+    <textarea style="width:100%;height:90%;"></textarea>
+  </div>
+</div>
+
+<div id="browser-window" class="window hidden">
+  <div class="window-titlebar">
+    <span>Navegador</span>
+    <div class="window-buttons">
+      <button class="min">—</button>
+      <button class="max">□</button>
+      <button class="close">×</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <iframe src="https://www.bing.com" style="width:100%;height:100%;border:none;"></iframe>
+  </div>
+</div>
+
+<div id="system-window" class="window hidden">
+  <div class="window-titlebar">
+    <span>Configurações</span>
+    <div class="window-buttons">
+      <button class="min">—</button>
+      <button class="max">□</button>
+      <button class="close">×</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <h2>Configurações do Sistema</h2>
+    <p>Aqui você pode alterar temas, papel de parede e preferências.</p>
+  </div>
 </div>
 
 <script src="script.js"></script>
