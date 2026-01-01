@@ -94,17 +94,80 @@ function removeTaskIcon(winId) {
 // ----------------------
 document.querySelectorAll(".app").forEach(app => {
     app.addEventListener("click", () => {
-        const appName = app.querySelector("p").textContent.toLowerCase();
-        let winId = "";
-
-        if (appName.includes("configurações")) winId = "system-window";
-        // Aqui você pode criar outras janelas: explorer-window, browser-window etc.
-
-        if (winId) {
-            const win = document.getElementById(winId);
-            win.classList.remove("hidden");
-            addTaskIcon(winId, "<i class='fa-solid fa-window-maximize'></i>");
-            setupWindow(winId);
-        }
+        const winId = app.dataset.window;
+        const win = document.getElementById(winId);
+        win.classList.remove("hidden");
+        addTaskIcon(winId, "<i class='fa-solid fa-window-maximize'></i>");
+        setupWindow(winId);
     });
 });
+
+// ----------------------
+// Calculadora funcional
+// ----------------------
+const calcDisplay = document.getElementById("calc-display");
+if (calcDisplay) {
+    document.querySelectorAll("#calc-buttons button").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const val = btn.textContent;
+            if (val === "=") {
+                try {
+                    calcDisplay.value = eval(calcDisplay.value);
+                } catch {
+                    calcDisplay.value = "Erro";
+                }
+            } else {
+                calcDisplay.value += val;
+            }
+        });
+    });
+}
+
+// ----------------------
+// Painel de Controle: troca de tema
+// ----------------------
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.body.style.backgroundColor = "#111";
+        document.querySelector(".wallpaper").style.filter = "brightness(0.5)";
+    } else {
+        document.body.style.backgroundColor = "#fff";
+        document.querySelector(".wallpaper").style.filter = "brightness(1)";
+    }
+}
+
+// Exemplo: botão dentro da janela de Configurações
+const sysWin = document.getElementById("system-window");
+if (sysWin) {
+    const content = sysWin.querySelector(".window-content");
+    const btnDark = document.createElement("button");
+    btnDark.textContent = "Tema Escuro";
+    btnDark.onclick = () => applyTheme("dark");
+    const btnLight = document.createElement("button");
+    btnLight.textContent = "Tema Claro";
+    btnLight.onclick = () => applyTheme("light");
+    content.appendChild(btnDark);
+    content.appendChild(btnLight);
+}
+
+// ----------------------
+// Ícones de status (Wi-Fi, Som, Bateria)
+// ----------------------
+const statusBar = document.querySelector(".task-clock");
+if (statusBar) {
+    const wifi = document.createElement("i");
+    wifi.className = "fa-solid fa-wifi";
+    wifi.style.marginLeft = "15px";
+
+    const sound = document.createElement("i");
+    sound.className = "fa-solid fa-volume-high";
+    sound.style.marginLeft = "10px";
+
+    const battery = document.createElement("i");
+    battery.className = "fa-solid fa-battery-three-quarters";
+    battery.style.marginLeft = "10px";
+
+    statusBar.appendChild(wifi);
+    statusBar.appendChild(sound);
+    statusBar.appendChild(battery);
+}
