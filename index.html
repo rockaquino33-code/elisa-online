@@ -32,6 +32,9 @@
     <div class="app" data-window="notepad-window"><i class="fa-solid fa-file-lines"></i><p>Bloco de Notas</p></div>
     <div class="app" data-window="browser-window"><i class="fa-solid fa-globe"></i><p>Navegador</p></div>
     <div class="app" data-window="system-window"><i class="fa-solid fa-gear"></i><p>Configurações</p></div>
+    <div class="app" data-window="calc-window"><i class="fa-solid fa-calculator"></i><p>Calculadora</p></div>
+    <div class="app" data-window="music-window"><i class="fa-solid fa-music"></i><p>Player Música</p></div>
+    <div class="app" data-window="trash-window"><i class="fa-solid fa-trash"></i><p>Lixeira</p></div>
   </div>
 </div>
 
@@ -90,6 +93,57 @@
   <div class="window-content">
     <h2>Configurações do Sistema</h2>
     <p>Aqui você pode alterar temas, papel de parede e preferências.</p>
+  </div>
+</div>
+
+<div id="calc-window" class="window hidden">
+  <div class="window-titlebar">
+    <span>Calculadora</span>
+    <div class="window-buttons">
+      <button class="min">—</button>
+      <button class="max">□</button>
+      <button class="close">×</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <input type="text" id="calc-display" readonly style="width:100%;padding:10px;font-size:18px;margin-bottom:10px;">
+    <div id="calc-buttons" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+      <button>7</button><button>8</button><button>9</button><button>/</button>
+      <button>4</button><button>5</button><button>6</button><button>*</button>
+      <button>1</button><button>2</button><button>3</button><button>-</button>
+      <button>0</button><button>.</button><button>=</button><button>+</button>
+    </div>
+  </div>
+</div>
+
+<div id="music-window" class="window hidden">
+  <div class="window-titlebar">
+    <span>Player de Música</span>
+    <div class="window-buttons">
+      <button class="min">—</button>
+      <button class="max">□</button>
+      <button class="close">×</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <audio controls style="width:100%;">
+      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+      Seu navegador não suporta áudio.
+    </audio>
+  </div>
+</div>
+
+<div id="trash-window" class="window hidden">
+  <div class="window-titlebar">
+    <span>Lixeira</span>
+    <div class="window-buttons">
+      <button class="min">—</button>
+      <button class="max">□</button>
+      <button class="close">×</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <p>Aqui ficam os arquivos excluídos (simulação).</p>
   </div>
 </div>
 
